@@ -20,7 +20,8 @@ To build all the recipes, you will need to
 5. Run `autopkg run -v --recipe-list=recipes-to-package.txt`
 
 This should:
-6. Generate recipe files for all of the latest releases of the CC applications
-7. Package those which are listed in `recipes-to-package.txt`.
-8. Upload the packages to your JSS
-9. Create policies and smartgroups as required 
+
+1. Generate recipe files for all of the latest releases of the CC applications
+2. Package those which are listed in `recipes-to-package.txt`.
+3. Upload the packages to your JSS
+4. Create policies and smartgroups as required 
