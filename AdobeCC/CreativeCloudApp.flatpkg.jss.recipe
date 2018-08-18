@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Description</key>
+	<string>Creates a flat package from an adobe CCP installer or uninstaller package</string>
+	<key>Identifier</key>
+	<string>com.github.uoe-macos.jss.flatpkg.Adobe.CreativeCloudApp</string>
+	<key>Input</key>
+	<dict>
+		<key>NAME</key>
+		<string>%NAME%</string>
+		<key>CATEGORY</key>
+                <string>FOR TESTING ONLY</string>
+                <key>FETCH_ICON</key>
+                <string>true</string>
+                <key>FETCH_RELEASE_NOTES</key>
+                <string>false</string>
+                <key>GROUP_NAME</key>
+                <string>Scope - %NAME%</string>
+                <key>GROUP_TEMPLATE</key>
+                <string>SmartGroupTemplate.xml</string>
+                <key>NAME 2</key>
+                <string>%NAME%</string>
+                <key>OS_REQUIREMENTS</key>
+                <string></string>
+                <key>POLICY_CATEGORY</key>
+                <string>FOR TESTING ONLY</string>
+                <key>POLICY_TEMPLATE</key>
+                <string>PolicyTemplate.xml</string>
+                <key>SELF_SERVICE_DESCRIPTION</key>
+                <string></string>
+                <key>SELF_SERVICE_ICON</key>
+                <string></string>
+	</dict>
+	<key>MinimumVersion</key>
+	<string>0.2.0</string>
+	<key>ParentRecipe</key>
+	<string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
+	<key>Process</key>
+	<array>
+		<dict>
+			<key>Arguments</key>
+			<dict>
+				<key>info_path</key>
+				<string>%pkg_path%/Contents/Info.plist</string>
+				<key>plist_keys</key>
+				<dict>
+					<key>CFBundleIdentifier</key>
+					<string>pkg_id</string>
+				</dict>
+			</dict>
+			<key>Processor</key>
+			<string>PlistReader</string>
+		</dict>
+		<!-- Our package doesn't have a payload but PkgCreator
+                     seems to want one. Create it to heep it happy
+                -->
+		<dict>
+			<key>Arguments</key>
+			<dict>
+				<key>pkgdirs</key>
+				<dict/>
+				<key>pkgroot</key>
+				<string>%RECIPE_CACHE_DIR%/pkgroot</string>
+			</dict>
+			<key>Processor</key>
+			<string>PkgRootCreator</string>
+		</dict>
+		<dict>
+			<key>Arguments</key>
+			<dict>
+				<key>pkg_request</key>
+				<dict>
+					<key>chown</key>
+					<array/>
+					<key>id</key>
+					<string>%pkg_id%</string>
+					<key>pkgname</key>
+					<string>%NAME%-%version%</string>
+					<key>pkgroot</key>
+					<string>%RECIPE_CACHE_DIR%/pkgroot</string>
+					<key>pkgtype</key>
+					<string>flat</string>
+					<key>scripts</key>
+					<string>%pkg_path%/Contents/Resources</string>
+					<key>version</key>
+					<string>%version%</string>
+				</dict>
+			</dict>
+			<key>Processor</key>
+			<string>PkgCreator</string>
+		</dict>
+                <dict>
+                        <key>Arguments</key>
+                        <dict>
+                                <key>category</key>
+                                <string>%CATEGORY%</string>
+                                <key>groups</key>
+                                <array>
+                                        <dict>
+                                                <key>name</key>
+                                                <string>%GROUP_NAME%</string>
+                                                <key>smart</key>
+                                                <true/>
+                                                <key>template_path</key>
+                                                <string>%GROUP_TEMPLATE%</string>
+                                        </dict>
+                                </array>
+                                <key>os_requirements</key>
+                                <string>%OS_REQUIREMENTS%</string>
+                                <key>policy_category</key>
+                                <string>%POLICY_CATEGORY%</string>
+                                <key>policy_template</key>
+                                <string>%POLICY_TEMPLATE%</string>
+                                <key>prod_name</key>
+                                <string>%NAME%</string>
+                                <key>self_service_description</key>
+                                <string>%SELF_SERVICE_DESCRIPTION%</string>
+                                <key>self_service_icon</key>
+                                <string>%SELF_SERVICE_ICON%</string>
+                                <key>version</key>
+                                <string>%version%</string>
+                        </dict>
+                        <key>Processor</key>
+                        <string>JSSImporter</string>
+                </dict>
+        </array>
+</dict>
+</plist>
