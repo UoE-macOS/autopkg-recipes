@@ -13,14 +13,14 @@ Usage
 
 To build all the recipes, you will need to
 
-# Install Autopkg
-# Install JSSImporter (at least v1.0.2)
-# Set up details for your JSS/JDS/JCDS in ~/Library/Preferences/com.github.autopkg.plist
-# Run `generate_recipes.py`
-# Run `autopkg run -v --recipe-list=recipes-to-package.txt`
+1. Install Autopkg
+2. Install JSSImporter (at least v1.0.2)
+3. Set up details for your JSS/JDS/JCDS in ~/Library/Preferences/com.github.autopkg.plist
+4. Run `generate_recipes.py`
+5. Run `autopkg run -v --recipe-list=recipes-to-package.txt`
 
 This should:
-# Generate recipe files for all of the latest releases of the CC applications
-# Package those which are listed in `recipes-to-package.txt`.
-# Upload the packages to your JSS
-# Create policies and smartgroups as required 
+6. Generate recipe files for all of the latest releases of the CC applications
+7. Package those which are listed in `recipes-to-package.txt`.
+8. Upload the packages to your JSS
+9. Create policies and smartgroups as required 
