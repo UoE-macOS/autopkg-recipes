@@ -89,7 +89,10 @@ if __name__ == "__main__":
         for sapcode, productVersions in products.iteritems():
             print("SAP Code: {}".format(sapcode))
 
-	    productVersions = [productVersions[-1]]
+            # Grab the 'last' version of this product. Really we should
+            # try to work out which is the latest but for the moment this
+            # seems to give us that.
+            productVersions = [productVersions[-1]]
             for product in productVersions:
                 base_version = product['platforms']['platform'][0]['languageSet'][0].get('baseVersion')
                 if not base_version:
@@ -98,35 +101,33 @@ if __name__ == "__main__":
                 name = unicodedata.normalize("NFKD", product['displayName'])
                 #print("\t{0: <60}\tBaseVersion: {1: <14}\tVersion: {2: <14}".format(
             
-		
-		if name.find('Adobe') == 0:
-		    name = name
-		else: name = 'Adobe' + name
+            # Do our best to normalise names to end with 'CC2018'
+            # where it makes sense to do so, and remove spaces.
+            if not name.startswith('Adobe'):
+                name = 'Adobe' + name
+            if name.endswith(('CC', 'DC')):
+                name += '2018'
+            elif not (name.endswith(')') or name[-1].isdigit()):
+                name += 'CC2018'
+            name = name.replace(" ","")
 
-		if (name.find('CC') == (len(name) - 2) or
-		    name.find('DC') == (len(name) - 2)):
-		    name += '2018'
-		elif (name[-1] == ')' or
-                      name[-1].isdigit()):
-	            name = name
-                else:
-  		    name = name + 'CC2018'
-                name = name.replace(" ","")
-
-	        print("{0}\t{1: <60}\tBaseVersion: {2: <14}\tVersion: {3: <14}".format(
+            print("{0}\t{1: <60}\tBaseVersion: {2: <14}\tVersion: {3: <14}".format(
                     sapcode,
-		    name,
+                    name,
                     base_version,
                     product['version']
                 ))
-		
-		output = ""
-		with open('AdobeCCTemplate.tmpl', 'r') as template:
-		    output = template.read()
+        
+            # Write out a recipe file for each product. We're not going to want
+            # to package all of them, but this gives us the opportunity to review and
+            # choose the ones we want.
+            output = ""
+            with open('AdobeCCTemplate.tmpl', 'r') as template:
+                output = template.read()
 
-		output = output.format(**{'sapcode': sapcode, 'name':name, 'base_version': base_version})
+            output = output.format(**{'sapcode': sapcode, 'name':name, 'base_version': base_version})
 
-		with open('GeneratedRecipes/'+name+'.jss.recipe', 'w') as outfile:
-	            outfile.write(output)
+            with open('GeneratedRecipes/'+name+'.jss.recipe', 'w') as outfile:
+                    outfile.write(output)
        
             print("")
