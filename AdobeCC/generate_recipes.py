@@ -93,7 +93,7 @@ if __name__ == "__main__":
             for product in productVersions:
                 base_version = product['platforms']['platform'][0]['languageSet'][0].get('baseVersion')
                 if not base_version:
-                    base_version = "N/A"
+                    base_version = None 
 
                 name = unicodedata.normalize("NFKD", product['displayName'])
                 #print("\t{0: <60}\tBaseVersion: {1: <14}\tVersion: {2: <14}".format(
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 	        print("{0}\t{1: <60}\tBaseVersion: {2: <14}\tVersion: {3: <14}".format(
                     sapcode,
 		    name,
-                    base_version,
+                    base_version or "N/A",
                     product['version']
                 ))
 		
@@ -124,7 +124,7 @@ if __name__ == "__main__":
 		with open('AdobeCCTemplate.tmpl', 'r') as template:
 		    output = template.read()
 
-		output = output.format(**{'sapcode': sapcode, 'name':name, 'base_version': base_version})
+		output = output.format(**{'sapcode': sapcode, 'name':name, 'base_version': base_version or ""})
 
 		with open('GeneratedRecipes/'+name+'.jss.recipe', 'w') as outfile:
 	            outfile.write(output)
