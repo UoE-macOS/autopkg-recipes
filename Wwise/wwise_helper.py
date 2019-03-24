@@ -8,6 +8,7 @@ import urllib2
 import shutil
 import sys
 import os
+from distutils.version import LooseVersion
 from base64 import b64decode
 
 DESCRIPTION = ('Emulate the Wwise Launcher application to download and install '
@@ -24,9 +25,9 @@ def process_args(argv=None):
                                      version=VERSION)
 
     parser.add_argument('--bundle',
-                        dest='BUNDLE', default='2018.1.1_6727', 
+                        dest='BUNDLE', default='LATEST', 
                         help=('ID of the bundle that you want to build '
-                              'defaults to 2018.1.1_6727'))
+                              'defaults to latest available'))
     parser.add_argument('--email', default='',
                         dest='EMAIL', help=('Wwise account email address. '
                                             'Leave this unset for anonymous download.'))
@@ -91,7 +92,7 @@ def main(args):
 
     CONTEXT_DATA = {"context": {
         "version": 1
-    }
+        }
     }
 
     ARCHIVES_APP = ['Wwise.app.zip']
@@ -125,10 +126,23 @@ def main(args):
     body.update(LAUNCHER_DATA)
     body.update(CONTEXT_DATA)
 
-    # This file is enormous, and in practice we already know which bundle we want
-    # resp = requests.post(urlbase+'allBundles', json=body)
-    # bundles = decode_payload(resp.text)
-    # print(bundles)
+    if args.BUNDLE == 'LATEST':
+        resp = fetch(URLBASE+'allBundles', data=body)
+        products = decode_payload(resp.read())
+        available_versions = ['{}.{}.{}_{}'.format( b['bundle']['version']['year'],
+                                                    b['bundle']['version']['major'], 
+                                                    b['bundle']['version']['minor'],
+                                                    b['bundle']['version']['build'])
+                                for b in products['bundles'] 
+                                if b['bundle'].get('name', '') == 'Wwise']
+        
+        sorted_versions = sorted(
+            available_versions, key=lambda k: LooseVersion(k))
+        print('Available versions:', available_versions)
+        latest_version = available_versions[0]
+        args.BUNDLE = latest_version
+
+    print('Selected version:', args.BUNDLE)
 
     # Download a JSON list of all the available files for this bundle
     resp = fetch(URLBASE + 'getFiles&bundle_id=' + args.BUNDLE, data=body)
