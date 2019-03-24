@@ -64,8 +64,8 @@ class WwiseInstallProvider(Processor):
         # Hack alert - add RECIPE_SEARCH_DIRS to sys.path
         # so that we can load our wwise_helper. I suspect this
         # is not very AutoPkgythonic.
-        sys.path.extend(self.env['RECIPE_SEARCH_DIRS'])
-        import wwise_helper
+        sys.path.append(os.path.dirname(self.env['RECIPE_PATH']))
+	import wwise_helper
 
         EMAIL = self.env.get('EMAIL', '')
         PASSWORD = self.env.get('PASSWORD', '')
