@@ -11,7 +11,7 @@
         <key>NAME</key>
         <string>Wwise</string>
         <key>VERSION</key>
-        <string>2018.1.6_6858</string>
+        <string/>
         <key>EMAIL</key>
         <string></string>
         <key>PASSWORD</key>
@@ -51,7 +51,7 @@
             <key>Arguments</key>
             <dict>
                 <key>pkgname</key>
-                <string>%NAME%-%VERSION%</string>
+                <string>%NAME%-%version%</string>
                 <key>pkg_request</key>
                 <dict>
                     <key>pkgdir</key>
@@ -61,7 +61,7 @@
                     <key>id</key>
                     <string>com.audiokinetik.pkg.wwise</string>
                     <key>version</key>
-                    <string>%VERSION%</string>
+                    <string>%version%</string>
                     <key>options</key>
                     <string>purge_ds_store</string>
                     <key>chown</key>
