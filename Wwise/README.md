@@ -9,8 +9,8 @@ The Wwise application itself is a Windows application which is packaged to run o
 Several configuration variables are available:
 
 * `VERSION`: The version to install. Setting this to LATEST or an empty string will give you the latest version available
-* `EMAIL`: If you have a Wwise login and wish to access proytected assets, set this variable to your email address
-* `PASSWORD`: ... and this one to the relevant password
+* `EMAIL`: If you have a Wwise login and wish to access protected assets, set this variable to your email address...
+* `PASSWORD`: ... and this one to the relevant password.
 * `INSTALL_STYLE`: Should be set to `mini` or `maxi`. `mini` will give you just the authoring packages, which is all that is required in our environment. `maxi` (experimental) will install all Wwise packages that are available, including SDKs for numerous platforms. If your email address has access to restricted content, `maxi` may install it, but this hasn't been tested.
 
 ## Implementation
