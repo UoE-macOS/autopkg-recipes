@@ -17,4 +17,4 @@ Several configuration variables are available:
 The `WwiseInstallProvider.py` processor is a thin wrapper around the `wwise_helper.py` tool in this directory. `wwise_helper.py` can be used on its own and has various options for controlling the installation. Run it directly for more information: `python wwise_helper.py --help`
 
 ## DISCLAIMER
-This recipe and associated helper tool use an undocumented and unsupported API. They may break at any time.
+This recipe and associated helper tool use an undocumented and unsupported API. They may break at any time. Please refer to this repository's [LICENSE](https://github.com/UoE-macOS/autopkg-recipes/blob/master/LICENSE)
