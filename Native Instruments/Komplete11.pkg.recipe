@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Package Native Instruments Komplete 11</string>
+    <key>Identifier</key>
+    <string>com.github.uoe-macos.pkg.komplete11</string>
+    <key>Input</key>
+    <dict>
+        <key>NAME</key>
+        <string>Wwise</string>
+        <key>VERSION</key>
+        <string>11</string>
+        <key>PRODUCT</key>
+        <string>Komplete</string>
+    </dict>
+    <key>MinimumVersion</key>
+    <string>0.2.0</string>
+    <key>Process</key>
+    <array>        
+        <dict>
+            <key>Processor</key>
+            <string>NIDownloadProvider</string>
+            <key>Arguments</key>
+            <dict>
+                <key>version</key>
+                <string>%VERSION%</string>
+                <key>downloads</key>
+                <string>%RECIPE_CACHE_DIR%/ni_downloads</string>
+                <key>product</key>
+                <string>Komplete</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>EndOfCheckPhase</string>
+        </dict>
+    </array>
+</dict>
+</plist>
