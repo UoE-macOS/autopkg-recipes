@@ -71,7 +71,8 @@ class WwiseInstallProvider(Processor):
         if (self.env['version'] == 'LATEST' or 
                   self.env['version'] == '' or 
                   not self.env['version']):
-            self.env['version'] = wwise_helper.main(wwise_helper.process_args(['--version-check']))
+            self.env['version'] = wwise_helper.main(
+                        wwise_helper.process_args(['--version-check']))
 
         EMAIL = self.env.get('EMAIL', '')
         PASSWORD = self.env.get('PASSWORD', '')

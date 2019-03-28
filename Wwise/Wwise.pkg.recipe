@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>Description</key>
-    <string>Package Wwise Interactiove Audio Engine</string>
+    <string>Package Wwise Interactive Audio Engine</string>
     <key>Identifier</key>
     <string>com.github.uoe-macos.pkg.wwise</string>
     <key>Input</key>
