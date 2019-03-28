@@ -15,7 +15,6 @@
 # limitations under the License.
 import os
 import sys
-
 from autopkglib import Processor, ProcessorError
 
 
@@ -25,13 +24,12 @@ __all__ = ["WwiseInstallProvider"]
 class WwiseInstallProvider(Processor):
     DOWNLOAD_DIR = 'wwise_downloads'
     REAL_INSTALL_PREFIX = "/"
-    DEFAULT_VERSION = '2018.1.6_6858'
 
     """Provides an installation of Wwise, ready for packaging"""
     input_variables = {
         "wwise_version": {
             "required": False,
-            "description": "Version. Defaults to %s" % DEFAULT_VERSION
+            "description": "Version. Defaults to the latest version"
         },
         "email": {
             "required": False,
@@ -51,8 +49,8 @@ class WwiseInstallProvider(Processor):
         }
     }
     output_variables = {
-        "install_root": {
-            "description": "Location of the installed package root"
+        "version": {
+            "description": "The version that was installed"
         },
     }
     description = __doc__
@@ -65,15 +63,24 @@ class WwiseInstallProvider(Processor):
         # so that we can load our wwise_helper. I suspect this
         # is not very AutoPkgythonic.
         sys.path.append(os.path.dirname(self.env['RECIPE_PATH']))
-	import wwise_helper
+	    
+        import wwise_helper
+        
+        # If we haven't been given a version to work with, find out
+        # the latest version and use that.
+        if (self.env['version'] == 'LATEST' or 
+                  self.env['version'] == '' or 
+                  not self.env['version']):
+            self.env['version'] = wwise_helper.main(
+                        wwise_helper.process_args(['--version-check']))
 
         EMAIL = self.env.get('EMAIL', '')
         PASSWORD = self.env.get('PASSWORD', '')
         STYLE = self.env.get('INSTALL_STYLE', 'mini')
 
         # Build an argumeht list as if we were going to call our
-        # helper tool on te commandline
-        argv =  ['--bundle', self.env['VERSION'],
+        # helper tool on the commandline
+        argv =  ['--bundle', self.env['version'],
                  '--email', EMAIL,
                  '--password', PASSWORD,
                  '--install', STYLE,

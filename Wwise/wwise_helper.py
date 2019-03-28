@@ -28,6 +28,7 @@ def process_args(argv=None):
                         dest='BUNDLE', default='LATEST', 
                         help=('ID of the bundle that you want to build '
                               'defaults to latest available'))
+                              
     parser.add_argument('--email', default='',
                         dest='EMAIL', help=('Wwise account email address. '
                                             'Leave this unset for anonymous download.'))
@@ -57,6 +58,10 @@ def process_args(argv=None):
                               '/Applications. Defaults to "/" and should be left unchanged '
                               'if you are building a package which will ultimately install '
                               'to /Applications.'))
+
+    parser.add_argument('--version-check', action='store_true', default=False,
+                        dest='CHECK_ONLY', help=('Just print the latest available '
+                                                'version and then exit.'))
 
     args = parser.parse_args(argv)
 
@@ -118,15 +123,15 @@ def main(args):
     # We get back a token called 'jwt' which has to be sent with subsequent requests
     jwt = decode_payload(resp.read())
 
-    print(jwt)
-
     # The body of all subsequent POST requests has to contain the following information
     body = {}
     body.update(jwt)
     body.update(LAUNCHER_DATA)
     body.update(CONTEXT_DATA)
 
-    if args.BUNDLE == 'LATEST':
+    if args.BUNDLE == 'LATEST' or args.CHECK_ONLY is True:
+        # Download and parse a file containing all available bundles
+        # to determine the latest version of Wwise
         resp = fetch(URLBASE+'allBundles', data=body)
         products = decode_payload(resp.read())
         available_versions = ['{}.{}.{}_{}'.format( b['bundle']['version']['year'],
@@ -138,11 +143,13 @@ def main(args):
         
         sorted_versions = sorted(
             available_versions, key=lambda k: LooseVersion(k))
-        print('Available versions:', available_versions)
         latest_version = available_versions[0]
         args.BUNDLE = latest_version
+    
+        print('Latest Version:', args.BUNDLE)
 
-    print('Selected version:', args.BUNDLE)
+    if args.CHECK_ONLY is True:
+        return args.BUNDLE
 
     # Download a JSON list of all the available files for this bundle
     resp = fetch(URLBASE + 'getFiles&bundle_id=' + args.BUNDLE, data=body)
