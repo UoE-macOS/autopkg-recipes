@@ -79,8 +79,15 @@
 chmod +x Unlocker
 echo "Running unlocker for Bute Loudness Suite Surround"
 ./Unlocker --licenseKey %LICENSE_KEY%
-exit $?
-                </string>
+if [ $? == 0 ]
+then
+    mv /var/root/Library/Application\ Support/ButeLoudnessSuiteSurround/ButeLoudnessSuiteSurround.key\
+       /Library/Application\ Support/ButeLoudnessSuiteSurround/
+else
+    echo "Failed"
+    exit 1
+fi
+		</string>
             </dict>
             <key>Processor</key>
             <string>FileCreator</string>
