@@ -13,11 +13,11 @@
         <key>NAME</key>
         <string>ButeLoudnessSuiteSurroundUnlocker</string>
         <key>DOWNLOAD_NAME</key>
-        <string>Unlocker</string>
+        <string>UnlockerBLSSurround</string>
         <key>VERSION</key>
         <string>1.3.1</string>
         <key>LICENSE_KEY</key>
-        <string>THisIsATest</string>
+        <string>OverrideThis</string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.2.0</string>
@@ -60,7 +60,7 @@
             <key>Arguments</key>
             <dict>
                 <key>source_path</key>
-                <string>%RECIPE_CACHE_DIR%/%NAME%/Unlocker</string>
+                <string>%RECIPE_CACHE_DIR%/%NAME%/%DOWNLOAD_NAME%</string>
                 <key>destination_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/Unlocker</string>
             </dict>
@@ -76,7 +76,14 @@
                 <string>0755</string>
                 <key>file_content</key>
                 <string>#!/bin/sh
+# We create the script here rather than in the 'Scripts' folder
+# because we want to interpolatethe value of LICENSE_KEY.
+
+# Inexplicably, the unlocker downloads without the execute bit set.
 chmod +x Unlocker
+
+# The unlocker will create a key file, specific to this machine,
+# in root's home folder. We copy it into the shared location.
 echo "Running unlocker for Bute Loudness Suite Surround"
 ./Unlocker --licenseKey %LICENSE_KEY%
 if [ $? == 0 ]
