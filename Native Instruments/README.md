@@ -15,6 +15,11 @@ Some configuration variables are available in the `NIDownloadProvider` processor
 * `product`: The product to install. Only 'Komplete' is currently supported
 * `downloads`: Folder to download items to
 
+### Product Lists
+I haven't been able to find any way to programatically determine the list of products that make up a suite (eg Komplete), so to help the processor we need to provide the lists as text files. You can see the list for Komplete 11 in the `product_lists` directory. To add a new product, or a new version of an existing product, just create a new file called PRODUCT_VERSION.txt in that directory and pass the PRODUCT and VERSION to autopkg. For example, you could create `product_lists/komplete_12.txt` and then override the `Komplete11.pkg.recipe` recipe, setting VERSION to 12.
+
+How do you get the identifiers? Good question. The best place I can suggest is to look in the preference files in `/Library/Preferences.com.native-instruments*` on a machine with the suite that you want installed.
+
 ## Implementation
 The `NIDownloadProvider.py` processor is a thin wrapper around the `native_instruments_helper.py` tool in this directory. `native_instruments_helper.py` can be used on its own to perform downloads or even full installs of (currently) Komplete 11. Run it for more information: `python ./native_instruments_helper.py --help`
 
