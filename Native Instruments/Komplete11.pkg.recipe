@@ -13,7 +13,7 @@
         <key>VERSION</key>
         <string>11</string>
         <key>PRODUCT</key>
-        <string>Komplete</string>
+        <string>komplete</string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.2.0</string>
@@ -29,7 +29,7 @@
                 <key>downloads</key>
                 <string>%RECIPE_CACHE_DIR%/ni_downloads</string>
                 <key>product</key>
-                <string>Komplete</string>
+                <string>komplete</string>
             </dict>
         </dict>
         <dict>

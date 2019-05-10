@@ -57,7 +57,8 @@ class NIDownloadProvider(Processor):
 
         # Build an argumeht list as if we were going to call our
         # helper tool on the commandline
-        argv =  ['--packages', '--download-dir', self.env['downloads']]
+        argv =  ['--packages', '--download-dir', self.env['downloads'],
+                 '--product', self.env['product'], '--major-version', self.env['version']]
 
         # Call our helper tool, passing it the argument list
         # we constructed above.
