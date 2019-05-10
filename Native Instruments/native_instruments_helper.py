@@ -291,7 +291,7 @@ set -euo pipefail
 echo "Mounting $iso..."
 vol="$(hdiutil attach -nobrowse "${{iso}}"  | tail -1 | awk -F '\t' '{{print $3}}')"
 
-pkg="$(ls "${{vol}}" | grep '\.pkg$' | head -1)"
+pkg="$(ls "${{vol}}" | grep '\.pkg$' | grep -v 'Part \d' | head -1)"
 
 if [ ! -z "${{pkg}}" ]
 then
