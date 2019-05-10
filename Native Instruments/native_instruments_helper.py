@@ -82,6 +82,11 @@ USER_AGENT = {'User-Agent': 'NativeAccess/1.7.2 (R88)'}
 
 AUTH_HEADER = {'Authorization': ''}
 
+# Image files larger than this will be split before being wrapped
+# into a package.
+MAX_FILE_SIZE = (6 * 1024 * 1024 * 1024) # 6GB
+# They will be split into segments of this size
+SEGMENT_SIZE = '5G'
 
 def main(args):
     global AUTH_HEADER
@@ -240,8 +245,42 @@ def copy_pkg(package, version, dest):
            os.path.join(dest, canonicalise_pkg_name(package, version))]
     subprocess.check_call(cmd)
 
-def wrap_iso(iso, version, dest):
-    # First, construct an appropriate package root
+def wrap_iso(iso, version, dest):    
+    # Set up some names of things
+    image_name = os.path.basename(iso)
+    pkg_name = image_name[:-4]
+    out_file = os.path.join(dest, canonicalise_pkg_name(pkg_name, version))
+
+    if os.path.isfile(out_file):
+        print("{} exists".format(out_file))
+        return True
+
+    if not os.path.isdir(dest):
+        os.makedirs(dest)
+
+    tmp_dir = tempfile.mkdtemp(suffix="NativeInstruments", dir=dest)
+
+    pkg_scripts = os.path.join(tmp_dir, 'Scripts')
+    
+    os.mkdir(pkg_scripts)
+
+    if os.path.getsize(iso) > MAX_FILE_SIZE:
+        # The image is too big to fit in a macos install package
+        # so we'll need to split it.
+
+        # First convert to UDZO format
+        dmg_path = os.path.join(tmp_dir, pkg_name + '.dmg')
+        subprocess.check_call(['hdiutil', 'convert', '-format', 'UDZO', '-o', dmg_path, iso])
+        
+        # Then split it up
+        subprocess.check_call(['hdiutil', 'segment', '-segmentSize', SEGMENT_SIZE, '-o', 
+                               os.path.join(pkg_scripts, pkg_name + '.split'), dmg_path])
+
+        image_name = image_name.replace('.iso', '.split.dmg')
+    else:
+        # Move iso into package folder
+        shutil.move(iso, os.path.join(pkg_scripts, os.path.basename(iso)))
+
     preinstall_script = r"""#!/bin/sh
 iso="{}"
 set -euo pipefail
@@ -260,30 +299,13 @@ else
     exit 1 # Leave mounted so admin can diagnose the issue
 fi
 diskutil unmount "${{vol}}"
-""".format(os.path.basename(iso))
-
-    pkg_name = os.path.basename(iso)[:-4]
-    out_file = os.path.join(dest, canonicalise_pkg_name(pkg_name, version))
-
-    if not os.path.isdir(dest):
-        os.makedirs(dest)
-
-    if os.path.isfile(out_file):
-        print("{} exists".format(out_file))
-        return True
-
-    pkgdir = tempfile.mkdtemp(suffix="NativeInstruments", dir=dest)
-    pkg_scripts = os.path.join(pkgdir, 'Scripts')
-    os.mkdir(pkg_scripts)
+""".format(image_name)
 
     with open(os.path.join(pkg_scripts, 'preinstall'), 'w') as f:
         f.write(preinstall_script)
 
     subprocess.check_call(['chmod', '0755', 
                            os.path.join(pkg_scripts, 'preinstall')])
-    
-    # Hard link instead of copying or moving
-    os.link(iso, os.path.join(pkg_scripts, os.path.basename(iso)))
 
     subprocess.check_call(['pkgbuild', '--nopayload', 
                            '--scripts', pkg_scripts,
@@ -291,7 +313,7 @@ diskutil unmount "${{vol}}"
                            '--id', 'com.nativeinstruments.' + pkg_name,
                            out_file])
 
-    shutil.rmtree(pkgdir)
+    shutil.rmtree(tmp_dir)
 
 
 def canonicalise_pkg_name(name, version):
