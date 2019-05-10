@@ -8,6 +8,8 @@ import shutil
 import subprocess
 import argparse
 import tempfile
+import time
+from socket import error as SocketError
 from distutils.version import LooseVersion
 import xml.etree.ElementTree as ET
 
@@ -155,6 +157,7 @@ def main(args):
                 continue
 
 
+
 def check_create_download_dirs(d_dir, dist_types):
     for atype in dist_types:
         if not os.path.isdir(d_dir + '/' + atype):
@@ -285,9 +288,9 @@ def wrap_iso(iso, version, dest):
 iso="{}"
 set -euo pipefail
 echo "Mounting $iso..."
-vol="$(hdiutil attach "${{iso}}"  | tail -1 | awk -F '\t' '{{print $3}}')"
+vol="$(hdiutil attach -nobrowse "${{iso}}"  | tail -1 | awk -F '\t' '{{print $3}}')"
 
-pkg="$(ls "${{vol}}" | grep '\.pkg$')"
+pkg="$(ls "${{vol}}" | grep '\.pkg$' | head -1)"
 
 if [ ! -z "${{pkg}}" ]
 then
@@ -296,7 +299,6 @@ then
     sleep 5
 else
     echo "Can't find a package at ${{vol}}"
-    exit 1 # Leave mounted so admin can diagnose the issue
 fi
 diskutil unmount "${{vol}}"
 """.format(image_name)
@@ -404,15 +406,23 @@ def fetch(url, dest=None, data=None, headers=None):
     if data:
         # If data is serialisable, send it as json
         try:
-            mydata = json.dumps(data)
+            data = json.dumps(data)
         except:
             # Just send whatever we were passed, raw
-            mydata = data
-        req = urllib2.Request(url, headers=myheaders, data=mydata)
+            pass
+    req = urllib2.Request(url, headers=myheaders, data=data)
+    retry_count = 0
+    resp = None
+    try:
         resp = urllib2.urlopen(req)
-    else:
-        req = urllib2.Request(url, headers=myheaders)
-        resp = urllib2.urlopen(req)
+    except SocketError as err:
+        if retry_count < 5:
+            retry_count += 1
+            print("NETWORK ERROR: {} - RETRYING: {}".format(err, retry_count))
+            time.sleep(5)
+            resp = urllib2.urlopen(req)
+        else:
+            print("NETWORK ERROR - GIVING UP")
     if dest:
         with open(dest, 'wb') as fp:
             shutil.copyfileobj(resp, fp)
