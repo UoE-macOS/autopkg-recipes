@@ -1,19 +1,19 @@
 # Native Instruments Autopkg Recipes
 
 ## Introduction
-Native Instruments is usually installed via a GUI application called 'Native Access'. This repo provides an AutoPkg processor which emulates enough of the behaviour of Native Access to allow AutoPkg to download all the packages that make up and install of a Native Instruments package.
+Native Instruments is usually installed via a GUI application called 'Native Access'. This repo provides an AutoPkg processor which emulates enough of the behaviour of Native Access to allow AutoPkg to download all the packages that make up an install of a Native Instruments product.
 
 Currently only Komplete 11 is supported - open an issue if you'd like something else: it's simple in principle.
 
 ## Recipes
-`Komplete11.pkg.recipe` is an example reciupe using the `NIDownloadProvider` processor. It will download all products for Komplete 11, and produce produce installable .pkg files from those that do not have them.
+`Komplete11.pkg.recipe` is an example recipe using the `NIDownloadProvider` processor. It will download all install media for Komplete 11, and produce produce installable .pkg files from ISOs where necessary (by wrapping the ISO in a .pkg).
 
 ## Configuration
 Some configuration variables are available in the `NIDownloadProvider` processor:
 
-* `version`: The version to install. Only '11' is currently supported
-* `product`: The product to install. Only 'Komplete' is currently supported
-* `downloads`: Folder to download items to
+* `version`: The version to install. Only '11' is currently supported.
+* `product`: The product to install. Only 'Komplete' is currently supported.
+* `downloads`: Folder to which to download items.
 
 ### Product Lists
 I haven't been able to find any way to programatically determine the list of products that make up a suite (eg Komplete), so to help the processor we need to provide the lists as text files. You can see the list for Komplete 11 in the `product_lists` directory. To add a new product, or a new version of an existing product, just create a new file called PRODUCT_VERSION.txt in that directory and pass the PRODUCT and VERSION to autopkg. For example, you could create `product_lists/komplete_12.txt` and then override the `Komplete11.pkg.recipe` recipe, setting VERSION to 12.
