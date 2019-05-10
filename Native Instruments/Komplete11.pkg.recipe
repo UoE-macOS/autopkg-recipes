@@ -15,7 +15,7 @@
         <key>PRODUCT</key>
         <string>komplete</string>
         <key>DOWNLOADS</key>
-        <string>%RECIPE_CACHE_DIR%/ni_downloads</string>
+        <string></string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.2.0</string>
