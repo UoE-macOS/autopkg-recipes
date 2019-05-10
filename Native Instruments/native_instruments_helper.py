@@ -246,7 +246,7 @@ def wrap_iso(iso, version, dest):
 iso="{}"
 set -euo pipefail
 echo "Mounting $iso..."
-vol="$(hdiutil attach $iso  | tail -1 | awk -F '\t' '{{print $3}}')"
+vol="$(hdiutil attach "${{iso}}"  | tail -1 | awk -F '\t' '{{print $3}}')"
 
 pkg="$(ls "${{vol}}" | grep '\.pkg$')"
 
