@@ -72,8 +72,8 @@ class NIDownloadProvider(Processor):
         native_instruments_helper.main(native_instruments_helper.process_args(argv))
 
         self.env["ni_downloader_summary_result"] = {
-            'summary_text': ("NIDownloader processor ran successfully.\n "
-                             "I can't tell you what it did yet!"),
+            'summary_text': ("NIDownloader processor ran successfully. "
+                             "I can't tell you what it did yet!\n"),
             'report_fields': ['identifier', 'version', 'pkg_path'],
             'data': {
                 'identifier': "",
