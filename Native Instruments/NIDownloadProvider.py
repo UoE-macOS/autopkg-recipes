@@ -41,6 +41,9 @@ class NIDownloadProvider(Processor):
         "version": {
             "description": "The version that was installed"
         },
+        "ni_downloader_summary_result": {
+            "description": "Description of interesting results."
+        }
     }
     description = __doc__
 
@@ -59,7 +62,7 @@ class NIDownloadProvider(Processor):
         print("Download path: ", self.env['downloads'])
         import native_instruments_helper
 
-        # Build an argumeht list as if we were going to call our
+        # Build an argument list as if we were going to call our
         # helper tool on the commandline
         argv =  ['--packages', '--download-dir', self.env['downloads'],
                  '--product', self.env['product'], '--major-version', self.env['version']]
@@ -67,6 +70,17 @@ class NIDownloadProvider(Processor):
         # Call our helper tool, passing it the argument list
         # we constructed above.
         native_instruments_helper.main(native_instruments_helper.process_args(argv))
+
+        self.env["ni_downloader_summary_result"] = {
+            'summary_text': ("NIDownloader processor ran successfully.\n "
+                             "I can't tell you what it did yet!"),
+            'report_fields': ['identifier', 'version', 'pkg_path'],
+            'data': {
+                'identifier': "",
+                'version': "",
+                'pkg_path': ""
+            }
+        }
 
 if __name__ == "__main__":
     processor = NIDownloadProvider()
