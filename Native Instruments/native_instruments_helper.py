@@ -30,12 +30,12 @@ def process_args(argv=None):
                               'Default: ./_downloads'))
 
     parser.add_argument('--suite',
-                        dest='SUITE', default='komplete', 
+                        dest='SUITE', default=None, 
                         help=('Suite to package. There must be a corresponding file in the '
                               'product_lists directory in the same directory as this script'))
 
     parser.add_argument('--major-version',
-                        dest='MAJOR_VERSION', default='11', 
+                        dest='MAJOR_VERSION', default=None, 
                         help=('Major version of SUITE to package. There must be a corresponding ' 
                               'file in the product_lists directory in the same directory as this script'))
 
@@ -51,19 +51,23 @@ def process_args(argv=None):
 
     parser.add_argument('--updates-only', default=False, action='store_true',
                         dest='UPDATES_ONLY', 
-                        help=('Do not look for new fullproduct installers, only updates. This '
+                        help=('Do not look for new full product installers, only updates. This '
                               'can hopefully be used to update an existing installation. YMMV'))
+    
+    parser.add_argument('--updates', default=False, action='store_true',
+                        dest='UPDATES', 
+                        help=('Look for updates as well as full products. Generally, full products '
+                              'are already the latest version, so you probably want --updates-only '
+                              'instead of this option if you are looking for updates.'))
 
     parser.add_argument('--packages', default=False, action='store_true',
                         dest='PACKAGES', 
                         help=('Copy packages into a subfolder in the downloads folder.'
                               'implies --download-only'))
 
-    parser.add_argument('--product-uuid', default=None,
-                        dest='UUID', 
+    parser.add_argument('--product-uuid', dest='UUID', 
                         help=('Give the UUID of a single product to operate on it '
                               'individually'))
-
 
     args = parser.parse_args(argv)
 
@@ -97,11 +101,19 @@ MAX_FILE_SIZE = (6 * 1024 * 1024 * 1024) # 6GB
 SEGMENT_SIZE = '5G'
 
 def main(args):
-    global AUTH_HEADER
+    if args.UUID and args.UUID != "":
+        products = [args.UUID]
+    elif args.SUITE and args.MAJOR_VERSION:
+        products = read_suite(args.SUITE, args.MAJOR_VERSION)
+    else: 
+        print("You need to specify --product-uuid or --suite and --major-version")
+        sys.exit(255)
 
-    dist_types = ['updates']
-    if not args.UPDATES_ONLY:
-        dist_types.insert(0, 'full-products') 
+    dist_types = ['full-products']
+    if args.UPDATES:
+        dist_types.append('updates')
+    if args.UPDATES_ONLY:
+        dist_types.remove('full-products')
 
     check_create_download_dirs(args.DOWNLOAD_DIR, dist_types)
 
@@ -121,10 +133,6 @@ def main(args):
     AUTH_HEADER['Authorization'] = 'Bearer ' + token
 
     report_data = []
-    if args.UUID:
-        products = [args.UUID]
-    else:
-        products = read_suite(args.SUITE, args.MAJOR_VERSION)
     for prod in products:
         for dist_type in dist_types:
             try:
