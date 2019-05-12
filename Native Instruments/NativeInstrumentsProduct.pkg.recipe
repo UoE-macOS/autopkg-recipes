@@ -12,8 +12,8 @@
         <string>Komplete</string>
         <key>VERSION</key>
         <string>11</string>
-        <key>PRODUCT</key>
-        <string>komplete</string>
+        <key>PRODUCT_UUID</key>
+        <string>2665347d-14a1-4fbd-896b-961c554adc9a</string>
         <key>DOWNLOADS</key>
         <string></string>
     </dict>
@@ -30,8 +30,8 @@
                 <string>%VERSION%</string>
                 <key>downloads</key>
                 <string>%DOWNLOADS%</string>
-                <key>product</key>
-                <string>%PRODUCT%</string>
+                <key>product_uuid</key>
+                <string>%PRODUCT_UUID%</string>
             </dict>
         </dict>
         <dict>

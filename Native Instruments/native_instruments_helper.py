@@ -120,6 +120,7 @@ def main(args):
     # Stash our auth token.
     AUTH_HEADER['Authorization'] = 'Bearer ' + token
 
+    report_data = []
     if args.UUID:
         products = [args.UUID]
     else:
@@ -143,17 +144,27 @@ def main(args):
                             continue
                         if args.PACKAGES and candidate.endswith('.iso'):
                             # Wrap the ISO in a .pkg installer
-                            wrap_iso(candidate, version, 
-                                     dest=os.path.join(args.DOWNLOAD_DIR, dist_type, '_packages'))
+                            (final_pkg, final_version) = wrap_iso(candidate, version, 
+                                                                  dest=os.path.join(args.DOWNLOAD_DIR, 
+                                                                  dist_type, '_packages'))
+                            # If the variables are empty, nothing was created
+                            if final_pkg and final_version:
+                                report_data.append({'package': final_pkg, 'version': final_version})
+
                             continue
                         path = None # Set this to something so we can reference it in the finally block
                         try:
                             path, pkg = attach_image(candidate)
                             if args.PACKAGES:
-                                copy_pkg(os.path.join(path, pkg), version,
-                                         os.path.join(args.DOWNLOAD_DIR, dist_type, '_packages'))
+                                (final_pkg, final_version) = copy_pkg(os.path.join(path, pkg), version,
+                                                                      os.path.join(args.DOWNLOAD_DIR, 
+                                                                      dist_type, '_packages'))
+                                # If the variables are empty, nothing was created
+                                if final_pkg and final_version:
+                                    report_data.append({'package': final_pkg, 'version': final_version})
                             else:
                                 install_pkg(path + '/' + pkg, candidate, version)
+
                         except subprocess.CalledProcessError as err:
                             print("INSTALL FAILED: {} ({})".format(pkg, err))
                             continue
@@ -165,6 +176,8 @@ def main(args):
             except urllib2.HTTPError as err:
                 sys.stderr.write("{}\n".format(err))
                 continue
+    if report_data != []:
+        return report_data    
 
 
 
@@ -254,9 +267,11 @@ def copy_pkg(package, version, dest):
     print("Copying: ", package)
     if not os.path.isdir(dest):
         os.mkdir(dest)
-    cmd = ['cp', package, 
-           os.path.join(dest, canonicalise_pkg_name(package, version))]
+    out_pkg = canonicalise_pkg_name(package, version)
+    cmd = ['cp', package, os.path.join(dest, out_pkg)]
     subprocess.check_call(cmd)
+
+    return((out_pkg, version))
 
 def wrap_iso(iso, version, dest):    
     # Set up some names of things
@@ -266,7 +281,7 @@ def wrap_iso(iso, version, dest):
 
     if os.path.isfile(out_file):
         print("{} exists".format(out_file))
-        return True
+        return((None, None))
 
     if not os.path.isdir(dest):
         os.makedirs(dest)
@@ -326,6 +341,8 @@ diskutil unmount "${{vol}}"
                            out_file])
 
     shutil.rmtree(tmp_dir)
+
+    return((out_file, version))
 
 
 def canonicalise_pkg_name(name, version):

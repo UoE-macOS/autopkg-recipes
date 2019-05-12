@@ -28,9 +28,9 @@ class NIDownloadProvider(Processor):
             "required": False,
             "description": "Version. Only '11' is currently supported"
         },
-        "product": {
-            "required": False,
-            "description": "Product: only 'Komplete' is currently supported"
+        "product_uuid": {
+            "required": True,
+            "description": "UUID of the product you want to package"
         },
         "downloads": {
             "required": True,
@@ -65,22 +65,19 @@ class NIDownloadProvider(Processor):
         # Build an argument list as if we were going to call our
         # helper tool on the commandline
         argv =  ['--packages', '--download-dir', self.env['downloads'],
-                 '--suite', self.env['product'], '--major-version', self.env['version']]
+                 '--product-uuid', self.env['product_uuid'] ]
 
         # Call our helper tool, passing it the argument list
         # we constructed above.
-        native_instruments_helper.main(native_instruments_helper.process_args(argv))
+        report_data = native_instruments_helper.main(native_instruments_helper.process_args(argv))
 
-        self.env["ni_downloader_summary_result"] = {
-            'summary_text': ("NIDownloader processor ran successfully. "
-                             "I can't tell you what it did yet!\n"),
-            'report_fields': ['identifier', 'version', 'pkg_path'],
-            'data': {
-                'identifier': "1",
-                'version': "2",
-                'pkg_path': "3"
-             },
-        }
+        if report_data:
+            self.env["ni_downloader_summary_result"] = {
+                'summary_text': ("NIDownloader processor ran successfully. "
+                                 "the following items were created:\n"),
+                'report_fields': ['package', 'version'],
+                'data': report_data
+            }
 
 if __name__ == "__main__":
     processor = NIDownloadProvider()
