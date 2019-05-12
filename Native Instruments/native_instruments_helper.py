@@ -120,7 +120,11 @@ def main(args):
     # Stash our auth token.
     AUTH_HEADER['Authorization'] = 'Bearer ' + token
 
-    for prod in read_suite(args.SUITE, args.MAJOR_VERSION):
+    if args.UUID:
+        products = [args.UUID]
+    else:
+        products = read_suite(args.SUITE, args.MAJOR_VERSION)
+    for prod in products:
         for dist_type in dist_types:
             try:
                 artifacts = get_artifacts(prod, dist_type)
