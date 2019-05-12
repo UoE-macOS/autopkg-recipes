@@ -26,7 +26,7 @@ class NIDownloadProvider(Processor):
     input_variables = {
         "version": {
             "required": False,
-            "description": "Version. Only '11' is currently supported"
+            "description": "Version. Currently does nothing. You get the latest version."
         },
         "product_uuid": {
             "required": True,
