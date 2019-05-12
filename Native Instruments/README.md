@@ -1,27 +1,27 @@
 # Native Instruments Autopkg Recipes
 
 ## Introduction
-Native Instruments is usually installed via a GUI application called 'Native Access'. This repo provides an AutoPkg processor which emulates enough of the behaviour of Native Access to allow AutoPkg to download all the packages that make up an install of a Native Instruments product.
+Native Instruments is usually installed via a GUI application called 'Native Access'. This repo provides an AutoPkg processor which emulates enough of the behaviour of Native Access to allow AutoPkg to download product artefacts and wrap them into packages.
 
-Currently only Komplete 11 is supported - open an issue if you'd like something else: it's simple in principle.
+You need to provide autopkg with the UUID of the product you want to package - I can't find any way of deriving this programmatically from the name. 
 
 ## Recipes
-`Komplete11.pkg.recipe` is an example recipe using the `NIDownloadProvider` processor. It will download all install media for Komplete 11, and produce produce installable .pkg files from ISOs where necessary (by wrapping the ISO in a .pkg).
+`NativeInstrumentsProduct.pkg.recipe` is an generic recipe using the `NIDownloadProvider` processor. You can override it and insert the UUID of the product you want to package in the PRODUCT_UUID variable.
 
 ## Configuration
 Some configuration variables are available in the `NIDownloadProvider` processor:
 
-* `version`: The version to install. Only '11' is currently supported.
-* `product`: The product to install. Only 'Komplete' is currently supported.
+* `product_uuid`: The product to install. Only 'Komplete' is currently supported.
 * `downloads`: Folder to which to download items.
+* `version`: This does nothing. You get the latest version. 
 
-### Product Lists
-I haven't been able to find any way to programatically determine the list of products that make up a suite (eg Komplete), so to help the processor we need to provide the lists as text files. You can see the list for Komplete 11 in the `product_lists` directory. To add a new product, or a new version of an existing product, just create a new file called PRODUCT_VERSION.txt in that directory and pass the PRODUCT and VERSION to autopkg. For example, you could create `product_lists/komplete_12.txt` and then override the `Komplete11.pkg.recipe` recipe, setting VERSION to 12.
+### Product UUIDs
+I haven't been able to find any way to programatically determine the list of products that make up a suite (eg Komplete), so the processor needs to be given the UUID of the product you want to package. You can see the list of UUIDs for Komplete 11 in the `product_lists` directory. 
 
-How do you get the identifiers? Good question. The best place I can suggest is to look in the preference files in `/Library/Preferences.com.native-instruments*` on a machine with the suite that you want installed.
+How do you get the UUIDs for a given suite? Good question. The best place I can suggest is to look in the preference files in `/Library/Preferences.com.native-instruments*` on a machine with the suite that you want installed.
 
 ## Implementation
-The `NIDownloadProvider.py` processor is a thin wrapper around the `native_instruments_helper.py` tool in this directory. `native_instruments_helper.py` can be used on its own to perform downloads or even full installs of (currently) Komplete 11. Run it for more information: `python ./native_instruments_helper.py --help`
+The `NIDownloadProvider.py` processor is a thin wrapper around the `native_instruments_helper.py` tool in this directory. `native_instruments_helper.py` can be used on its own to perform downloads or even full installs of Native Instruments products and suites. Run it for more information: `python ./native_instruments_helper.py --help`
 
 ## DISCLAIMER
 This recipe and associated helper tool use an undocumented and unsupported API. They may break at any time. Please refer to this repository's [LICENSE](https://github.com/UoE-macOS/autopkg-recipes/blob/master/LICENSE)
