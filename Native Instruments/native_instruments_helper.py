@@ -29,15 +29,15 @@ def process_args(argv=None):
                               '--preserve-downloads is specified '
                               'Default: ./_downloads'))
 
-    parser.add_argument('--product',
-                        dest='PRODUCT', default='komplete', 
-                        help=('Product to package. There must be a corresponding file in the '
+    parser.add_argument('--suite',
+                        dest='SUITE', default='komplete', 
+                        help=('Suite to package. There must be a corresponding file in the '
                               'product_lists directory in the same directory as this script'))
 
     parser.add_argument('--major-version',
                         dest='MAJOR_VERSION', default='11', 
-                        help=('Major version of PRODUCT to package. There must be a corresponding file in the '
-                              'product_lists directory in the same directory as this script'))
+                        help=('Major version of SUITE to package. There must be a corresponding ' 
+                              'file in the product_lists directory in the same directory as this script'))
 
     parser.add_argument('--preserve-downloads', default=False, action='store_true',
                         dest='PRESERVE', help=('Do not delete downloads after installation. '
@@ -58,6 +58,11 @@ def process_args(argv=None):
                         dest='PACKAGES', 
                         help=('Copy packages into a subfolder in the downloads folder.'
                               'implies --download-only'))
+
+    parser.add_argument('--product-uuid', default=None,
+                        dest='UUID', 
+                        help=('Give the UUID of a single product to operate on it '
+                              'individually'))
 
 
     args = parser.parse_args(argv)
@@ -115,7 +120,7 @@ def main(args):
     # Stash our auth token.
     AUTH_HEADER['Authorization'] = 'Bearer ' + token
 
-    for prod in read_product(args.PRODUCT, args.MAJOR_VERSION):
+    for prod in read_suite(args.SUITE, args.MAJOR_VERSION):
         for dist_type in dist_types:
             try:
                 artifacts = get_artifacts(prod, dist_type)
@@ -186,12 +191,12 @@ def install_native_access(downloads, install_dest):
     unmount(path)
 
 
-def read_product(product, version):
-    product_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 
-                                'product_lists', "{}_{}.txt".format(product, version))
-    print("Reading", product_file)
+def read_suite(suite, version):
+    suite_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 
+                                'product_lists', "{}_{}.txt".format(suite, version))
+    print("Reading", suite_file)
     id_list = None
-    with open(product_file, 'r') as f:
+    with open(suite_file, 'r') as f:
         id_list = f.readlines()
     return id_list
 
@@ -445,7 +450,7 @@ def fetch(url, dest=None, data=None, headers=None):
     if headers is not None:
         myheaders.update(headers)
 
-    # sys.stderr.write("fetch: {}\n".format(url))
+    #   sys.stderr.write("fetch: {}\n".format(url))
     if data:
         # If data is serialisable, send it as json
         try:

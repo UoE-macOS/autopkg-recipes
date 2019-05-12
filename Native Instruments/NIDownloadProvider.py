@@ -65,7 +65,7 @@ class NIDownloadProvider(Processor):
         # Build an argument list as if we were going to call our
         # helper tool on the commandline
         argv =  ['--packages', '--download-dir', self.env['downloads'],
-                 '--product', self.env['product'], '--major-version', self.env['version']]
+                 '--suite', self.env['product'], '--major-version', self.env['version']]
 
         # Call our helper tool, passing it the argument list
         # we constructed above.
@@ -76,10 +76,10 @@ class NIDownloadProvider(Processor):
                              "I can't tell you what it did yet!\n"),
             'report_fields': ['identifier', 'version', 'pkg_path'],
             'data': {
-                'identifier': "",
-                'version': "",
-                'pkg_path': ""
-            }
+                'identifier': "1",
+                'version': "2",
+                'pkg_path': "3"
+             },
         }
 
 if __name__ == "__main__":
