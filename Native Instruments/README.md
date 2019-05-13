@@ -3,10 +3,10 @@
 ## Introduction
 Native Instruments is usually installed via a GUI application called 'Native Access'. This repo provides an AutoPkg processor which emulates enough of the behaviour of Native Access to allow AutoPkg to download product artefacts and wrap them into packages.
 
-You need to provide autopkg with the UUID of the product you want to package - I can't find any way of deriving this programmatically from the name. 
+You need to provide autopkg with the UUIDs of the products you want to package - I can't find any way of deriving this programmatically from the name. 
 
-## Recipes
-`NativeInstrumentsProduct.pkg.recipe` is a generic recipe using the `NIDownloadProvider` processor. The repo includes a command to generate your own override files, one for each product that you want to package.
+## Where are the recipes?
+`NativeInstrumentsProduct.pkg.recipe` is a generic recipe using the `NIDownloadProvider` processor. This repo includes a command that you can use to generate your own set of override files, one for each product that you want to package.
 
 ## How to use this repo
 
