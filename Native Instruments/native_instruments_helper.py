@@ -165,7 +165,6 @@ def main(args):
                 latest = get_latest_artifacts(artifacts)
 
                 for art in latest:
-                    print(art)
                     files = process_artifact(art, dist_type=dist_type, download_dest=args.DOWNLOAD_DIR,
                                              force_download=(args.DOWNLOAD_ONLY or args.PACKAGES))
                     if not files: 
