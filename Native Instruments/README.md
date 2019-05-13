@@ -35,7 +35,7 @@ You can instead use the `--product-uuid` argument to template an override file f
 ## Configuration
 Some configuration variables are available in the `NIDownloadProvider` processor:
 
-* `product_uuid`: The product to install. Only 'Komplete' is currently supported.
+* `product_uuid`: UUID of the product for which you want a package. 
 * `downloads`: Folder to which to download items.
 * `version`: This does nothing. You get the latest version. 
 
