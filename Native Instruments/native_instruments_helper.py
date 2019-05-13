@@ -427,7 +427,7 @@ def process_artifact(artifact, dist_type, download_dest, force_download=False):
 
     print("{}, {}".format(artifact['title'], artifact['version']))
 
-    files_to_process = []
+    files_to_process = artifact['files']
     files_to_return = []
     
     # If there is an 'installer_type' and an 'iso_type', we just want the installer
@@ -436,7 +436,6 @@ def process_artifact(artifact, dist_type, download_dest, force_download=False):
         files_to_process = [ f for f in artifact['files'] if f['type'] == 'installer_type' ]
 
     for afile in files_to_process:
-
         # We don't want 'downloader_type' files - just ISOs, updaters and installers
         if not afile['type'] in ['iso_type', 'update_type', 'installer_type']:
             continue
