@@ -146,7 +146,7 @@ def main(args):
         token = get_bearer_token(os.path.join(na_location, 'Native Access.app/Contents/MacOS/Native Access'))
         # Save it for next time
         with open(token_file, 'w') as tf:
-            token = tf.write(token)
+            tf.write(token)
     else:
         # Read the token from our cache
         print("Reading token file: {}".format(token_file))
@@ -165,6 +165,7 @@ def main(args):
                 latest = get_latest_artifacts(artifacts)
 
                 for art in latest:
+                    print(art)
                     files = process_artifact(art, dist_type=dist_type, download_dest=args.DOWNLOAD_DIR,
                                              force_download=(args.DOWNLOAD_ONLY or args.PACKAGES))
                     if not files: 
