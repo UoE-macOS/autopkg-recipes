@@ -16,7 +16,8 @@ autopkg make-override NativeInstrumentsProduct.pkg.recipe
 ```
 2. Next, use the helper tool to generate overrides for all the products you want to package. This will simply copy the template override file you made in step 1, replacing the relevant info for each product.
 ```
-~/Library/AutoPkg/RecipeRepos/com.github.uoe-macos.autopkg-recipes/Native\ Instruments/native_instruments_helper.py\
+mkdir ~/Library/AutoPkg/RecipeOverrides/NativeInstruments
+python ~/Library/AutoPkg/RecipeRepos/com.github.uoe-macos.autopkg-recipes/Native\ Instruments/native_instruments_helper.py\
                 --template-autopkg-override \
                 --template-override-source ~/Library/AutoPkg/RecipeOverrides/NativeInstrumentsProduct.pkg.recipe \
                 --template-override-dest-dir ~/Library/AutoPkg/RecipeOverrides/NativeInstruments \
