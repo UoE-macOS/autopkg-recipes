@@ -76,7 +76,7 @@ class NIDownloadProvider(Processor):
                 'summary_text': ("NIDownloader processor ran successfully. "
                                  "the following items were created:\n"),
                 'report_fields': ['package', 'version'],
-                'data': report_data
+                'data': report_data[0]
             }
 
 if __name__ == "__main__":
