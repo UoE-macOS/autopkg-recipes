@@ -132,7 +132,7 @@ def main(args):
         token = get_bearer_token(os.path.join(na_location, 'Native Access.app/Contents/MacOS/Native Access'))
         # Save it for next time
         with open(token_file, 'w') as tf:
-            token = tf.write()
+            token = tf.write(token)
     else:
         # Read the token from our cache
         print("Reading token file: {}".format(token_file))
