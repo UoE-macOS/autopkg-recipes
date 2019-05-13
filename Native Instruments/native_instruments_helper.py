@@ -117,17 +117,27 @@ def main(args):
 
     check_create_download_dirs(args.DOWNLOAD_DIR, dist_types)
 
-    # Install the latest version of Native Access
-    if args.DOWNLOAD_ONLY or args.PACKAGES:
-        na_location = os.path.join(args.DOWNLOAD_DIR, 'Native Access')
-    else:   
-        na_location = ('/Applications')
+    token_file = os.path.join(args.DOWNLOAD_DIR, '.token')
 
-    install_native_access(args.DOWNLOAD_DIR, na_location)
+    # We need a token to talk to the NI API. See if we stashed it on a previous run
+    if not os.path.isfile(token_file):
+        # We need to grab the token from Native Access
+        if args.DOWNLOAD_ONLY or args.PACKAGES:
+            na_location = os.path.join(args.DOWNLOAD_DIR, 'Native Access')
+        else:   
+            na_location = ('/Applications')
 
-    # This authentication token is embedded in the application. 
-    # Make sure we have an up-to-date copy.   
-    token = get_bearer_token(os.path.join(na_location, 'Native Access.app/Contents/MacOS/Native Access'))
+        install_native_access(args.DOWNLOAD_DIR, na_location)
+
+        token = get_bearer_token(os.path.join(na_location, 'Native Access.app/Contents/MacOS/Native Access'))
+        # Save it for next time
+        with open(token_file, 'w') as tf:
+            token = tf.write()
+    else:
+        # Read the token from our cache
+        print("Reading token file: {}".format(token_file))
+        with open(token_file, 'r') as tf:
+            token = tf.read()
 
     # Stash our auth token.
     AUTH_HEADER['Authorization'] = 'Bearer ' + token
