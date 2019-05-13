@@ -12,7 +12,7 @@ You need to provide autopkg with the UUID of the product you want to package - I
 
 1. First, you need to generate an override file: 
 ```
-autopkg make-override NativeInstrumentsProduct.pkg.recipe`
+autopkg make-override NativeInstrumentsProduct.pkg.recipe
 ```
 2. Next, use the helper tool to generate overrides for all the products you want to package. This will simply copy the template override file you made in step 1, replacing the relevant info for each product.
 ```
@@ -24,7 +24,7 @@ autopkg make-override NativeInstrumentsProduct.pkg.recipe`
 ```
 3. Now that you have the override files you need, you can throw autopkg at it: 
 ```
-`autopkg run ~/Library/AutoPkg/RecipeOverrides/NativeInstruments/*`
+autopkg run ~/Library/AutoPkg/RecipeOverrides/NativeInstruments/*
 ```
 
 NB: The `--suite` and `--major-version` arguments rely on there being a file named \<suite\>\_\<major_version\>.txt in the product_lists folder. So far I only have such a list for Komplete 11 - contributions welcome.
