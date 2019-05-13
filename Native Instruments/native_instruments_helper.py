@@ -23,10 +23,12 @@ import subprocess
 import argparse
 import tempfile
 import time
+import plistlib
 from functools import wraps
 from socket import error as SocketError
 from distutils.version import LooseVersion
 import xml.etree.ElementTree as ET
+
 
 VERSION = '0.0.1'
 DESCRIPTION = 'TBD'
@@ -83,6 +85,18 @@ def process_args(argv=None):
                         help=('Give the UUID of a single product to operate on it '
                               'individually'))
 
+    parser.add_argument('--template-autopkg-override', dest='AUTOPKG_OVERRIDE', action='store_true',
+                        help=('Template an autopkg override file using OVERRIDE_SOURCE and writing the  '
+                              'output to OVERRIDE_DEST'))
+
+    parser.add_argument('--template-override-source', dest='OVERRIDE_SOURCE',
+                        help=('Source file to use for templating override files  '
+
+                              ''))
+    parser.add_argument('--template-override-dest-dir', dest='OVERRIDE_DEST',
+                        help=('Destination directory for templating override files  '
+                              ''))
+
     args = parser.parse_args(argv)
 
     if args.DOWNLOAD_ONLY:
@@ -131,7 +145,10 @@ def main(args):
 
     check_create_download_dirs(args.DOWNLOAD_DIR, dist_types)
 
-    token_file = os.path.join(args.DOWNLOAD_DIR, '.token')
+    # Store this somewhere independent so we can access it between runs
+    cache_dir = subprocess.check_output(['getconf', 'DARWIN_USER_CACHE_DIR']).strip()
+
+    token_file = os.path.join(cache_dir, '.nativeinstruments_token')
 
     # We need a token to talk to the NI API. See if we stashed it on a previous run
     if not os.path.isfile(token_file):
@@ -163,8 +180,12 @@ def main(args):
                 artifacts = get_artifacts(prod, dist_type)
 
                 latest = get_latest_artifacts(artifacts)
-
+                
                 for art in latest:
+                    if args.AUTOPKG_OVERRIDE:
+                        template_override_file(args.OVERRIDE_SOURCE, args.OVERRIDE_DEST, art)
+                        continue
+
                     files = process_artifact(art, dist_type=dist_type, download_dest=args.DOWNLOAD_DIR,
                                              force_download=(args.DOWNLOAD_ONLY or args.PACKAGES))
                     if not files: 
@@ -211,6 +232,17 @@ def main(args):
     if report_data != []:
         return report_data    
 
+def template_override_file(source, dest_dir, art):
+    out_file = os.path.join(dest_dir, art['title'].replace(' ', '') + '.pkg.recipe')
+    
+    in_plist = plistlib.readPlist(source)
+    
+    in_plist['Identifier'] = "local.package.{}".format(art['title'].replace(' ', ''))
+    in_plist['Input']['NAME'] = art['title']
+    in_plist['Input']['PRODUCT_UUID'] = art['upid']
+
+    plistlib.writePlist(in_plist, out_file)
+    print("Wrote:", out_file)
 
 
 def check_create_download_dirs(d_dir, dist_types):
@@ -395,8 +427,15 @@ def process_artifact(artifact, dist_type, download_dest, force_download=False):
 
     print("{}, {}".format(artifact['title'], artifact['version']))
 
+    files_to_process = []
     files_to_return = []
-    for afile in artifact['files']:
+    
+    # If there is an 'installer_type' and an 'iso_type', we just want the installer
+    if [ f for f in artifact['files'] if f['type'] == 'installer_type' ] != []:
+        print("Ignoring ISO installers as a DMG is available")
+        files_to_process = [ f for f in artifact['files'] if f['type'] == 'installer_type' ]
+
+    for afile in files_to_process:
 
         # We don't want 'downloader_type' files - just ISOs, updaters and installers
         if not afile['type'] in ['iso_type', 'update_type', 'installer_type']:

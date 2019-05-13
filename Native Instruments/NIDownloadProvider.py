@@ -55,11 +55,14 @@ class NIDownloadProvider(Processor):
         # so that we can load our wwise_helper. I suspect this
         # is not very AutoPkgythonic.
         sys.path.append(os.path.dirname(self.env['RECIPE_PATH']))
+
+        # Even more of a hack so that this works for overridden recipes
+        for path in self.env['PARENT_RECIPES']:
+            sys.path.append(os.path.dirname(path))
 	    
         if self.env['downloads'] == '':
             self.env['downloads'] = os.path.join(self.env['RECIPE_CACHE_DIR'], 'ni_downloads')
 
-        print("Download path: ", self.env['downloads'])
         import native_instruments_helper
 
         # Build an argument list as if we were going to call our
