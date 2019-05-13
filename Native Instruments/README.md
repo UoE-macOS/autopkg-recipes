@@ -14,7 +14,9 @@ You need to provide autopkg with the UUIDs of the products you want to package -
 ```
 autopkg make-override NativeInstrumentsProduct.pkg.recipe
 ```
-2. Next, use the helper tool to generate overrides for all the products you want to package. This will simply copy the template override file you made in step 1, replacing the relevant info for each product.
+There is no need to edit the file created by this step, unless you want to specify a custom Download location. If you do, edit the `DOWNLOADS` variable in the file that the above step generates. 
+
+2. Next, use the helper tool to generate overrides for all the products you want to package. This will simply copy the template override file you made in step 1 multiple times, replacing the relevant name and UUID for each product.
 ```
 mkdir ~/Library/AutoPkg/RecipeOverrides/NativeInstruments
 python ~/Library/AutoPkg/RecipeRepos/com.github.uoe-macos.autopkg-recipes/Native\ Instruments/native_instruments_helper.py\
@@ -23,7 +25,7 @@ python ~/Library/AutoPkg/RecipeRepos/com.github.uoe-macos.autopkg-recipes/Native
                 --template-override-dest-dir ~/Library/AutoPkg/RecipeOverrides/NativeInstruments \
                 --suite=komplete --major-version=11
 ```
-3. Now that you have the override files you need, you can throw autopkg at it: 
+3. Now that you have a folder containing the override files you need, you can throw autopkg at it: 
 ```
 autopkg run ~/Library/AutoPkg/RecipeOverrides/NativeInstruments/*
 ```
