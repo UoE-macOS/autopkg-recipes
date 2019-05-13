@@ -25,14 +25,13 @@ python ~/Library/AutoPkg/RecipeRepos/com.github.uoe-macos.autopkg-recipes/Native
                 --template-override-dest-dir ~/Library/AutoPkg/RecipeOverrides/NativeInstruments \
                 --suite=komplete --major-version=11
 ```
+NB: The `--suite` and `--major-version` arguments rely on there being a file named \<suite\>\_\<major_version\>.txt in the product_lists folder. So far I only have such a list for Komplete 11 - contributions welcome.
+You can instead use the `--product-uuid` argument to template an override file for a single product.
+
 3. Now that you have a folder containing the override files you need, you can throw autopkg at it: 
 ```
 autopkg run ~/Library/AutoPkg/RecipeOverrides/NativeInstruments/*
 ```
-
-NB: The `--suite` and `--major-version` arguments rely on there being a file named \<suite\>\_\<major_version\>.txt in the product_lists folder. So far I only have such a list for Komplete 11 - contributions welcome.
-You can instead use the `--product-uuid` argument to template an override file for a single product.
-
 
 ## Configuration
 Some configuration variables are available in the `NIDownloadProvider` processor:
