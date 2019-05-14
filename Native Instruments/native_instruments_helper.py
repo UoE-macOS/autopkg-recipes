@@ -335,7 +335,7 @@ def copy_pkg(package, version, dest):
     cmd = ['cp', package, os.path.join(dest, out_pkg)]
     subprocess.check_call(cmd)
 
-    return((out_pkg, version))
+    return((os.path.join(dest, out_pkg), version))
 
 def wrap_iso(iso, version, dest):    
     # Set up some names of things

@@ -39,7 +39,10 @@ class NIDownloadProvider(Processor):
     }
     output_variables = {
         "version": {
-            "description": "The version that was installed"
+            "description": "The version that was packaged"
+        },
+        "package_path": {
+            "description": "The path to the package"
         },
         "ni_downloader_summary_result": {
             "description": "Description of interesting results."
@@ -76,11 +79,13 @@ class NIDownloadProvider(Processor):
 
         if report_data:
             self.env["ni_downloader_summary_result"] = {
-                'summary_text': ("NIDownloader processor ran successfully. "
-                                 "the following items were created:\n"),
+                'summary_text': ("The NIDownloader processor created the following items:\n"),
                 'report_fields': ['package', 'version'],
                 'data': report_data[0]
             }
+
+            self.env['version'] = report_data[0]['version']
+            self.env['package_path'] = report_data[0]['package_path']
 
 if __name__ == "__main__":
     processor = NIDownloadProvider()
