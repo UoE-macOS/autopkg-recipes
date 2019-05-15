@@ -182,6 +182,7 @@ def main(args):
                 latest = get_latest_artifacts(artifacts)
                 
                 for art in latest:
+                    # If we're in 'file templating mode' just do our stuff
                     if args.AUTOPKG_OVERRIDE:
                         template_override_file(args.OVERRIDE_SOURCE, args.OVERRIDE_DEST, art)
                         continue
@@ -231,6 +232,7 @@ def main(args):
                 continue
     if report_data != []:
         return report_data    
+
 
 def template_override_file(source, dest_dir, art):
     out_file = os.path.join(dest_dir, art['title'].replace(' ', '') + '.pkg.recipe')
@@ -302,7 +304,7 @@ def attach_image(img):
     if not os.path.isfile(img) or not img.endswith(('.iso', '.dmg')):
         return None
 
-    output = subprocess.check_output(['hdiutil', 'attach', img])
+    output = subprocess.check_output(['hdiutil', 'attach', '-nobrowse', img])
     mounted_path = output.split("\t")[-1].strip()
     pkgs = [a for a in os.listdir(mounted_path) if a.endswith('.pkg')]
     try:
