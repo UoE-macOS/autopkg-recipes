@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Description</key>
+        <string>Install a Native Instruments suite directly from NI's CDN</string>
+        <key>Identifier</key>
+        <string>com.github.uoe-macos.pkg.native-instruments.suite.netinstall</string>
+        <key>Input</key>
+        <dict>
+            <key>MAJOR_VERSION</key>
+            <string></string>
+            <key>SUITE</key>
+            <string></string>
+        </dict>
+        <key>MinimumVersion</key>
+        <string>0.2.0</string>
+        <key>Process</key>
+        <array>
+            <dict>
+                <key>Processor</key>
+                <string>PkgRootCreator</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>pkgroot</key>
+                    <string>%RECIPE_CACHE_DIR%/ni_scripts</string>
+                    <key>pkgdirs</key>
+                    <dict/>
+                </dict>
+            </dict>
+            <dict>
+                <key>Processor</key>
+                <string>PkgRootCreator</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>pkgroot</key>
+                    <string>%RECIPE_CACHE_DIR%/ni_root</string>
+                    <key>pkgdirs</key>
+                    <dict/>
+                </dict>
+            </dict>
+            <dict>
+                <key>Arguments</key>
+                <dict>
+                    <key>source_path</key>
+                    <string>%RECIPE_DIR%/product_lists</string>
+                    <key>destination_path</key>
+                    <string>%RECIPE_CACHE_DIR%/ni_scripts/product_lists</string>
+                </dict>
+                <key>Processor</key>
+                <string>Copier</string>
+            </dict>
+            <dict>
+                <key>Arguments</key>
+                <dict>
+                    <key>source_path</key>
+                    <string>%RECIPE_DIR%/native_instruments_helper.py</string>
+                    <key>destination_path</key>
+                    <string>%RECIPE_CACHE_DIR%/ni_scripts</string>
+                </dict>
+                <key>Processor</key>
+                <string>Copier</string>
+            </dict>
+            <dict>
+                <key>Arguments</key>
+                <dict>
+                    <key>file_path</key>
+                    <string>%RECIPE_CACHE_DIR%/ni_scripts/postinstall</string>
+                    <key>file_mode</key>
+                    <string>0755</string>
+                    <key>file_content</key>
+                    <string>#!/bin/sh
+# Install Native Instruments %SUITE% version %MAJOR_VERSION%
+
+echo "Launching install of %SUITE% version %MAJOR_VERSION%"
+python ./native_instruments_helper.py --major-version %MAJOR_VERSION% \
+        --suite %SUITE% --download-dir /tmp/native_instruments
+
+exit $?
+                    </string>
+                </dict>
+                <key>Processor</key>
+                <string>FileCreator</string>
+            </dict>
+            <dict>
+                <key>Processor</key>
+                <string>PkgCreator</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>pkgname</key>
+                    <string>NativeInstruments_%SUITE%_NetInstall-%MAJOR_VERSION%</string>
+                    <key>pkg_request</key>
+                    <dict>
+                        <key>pkgdir</key>
+                        <string>%RECIPE_CACHE_DIR%</string>
+                        <key>pkgroot</key>
+                        <string>%RECIPE_CACHE_DIR%/ni_root</string>
+                        <key>id</key>
+                        <string>com.native-instruments.%SUITE%.netinstall</string>
+                        <key>version</key>
+                        <string>%MAJOR_VERSION%.0.0</string>
+                        <key>options</key>
+                        <string>purge_ds_store</string>
+                        <key>scripts</key>
+                        <string>%RECIPE_CACHE_DIR%/ni_scripts</string>
+                    </dict>
+                </dict>
+            </dict>
+            <dict>
+                <key>Processor</key>
+                <string>EndOfCheckPhase</string>
+            </dict>
+        </array>
+    </dict>
+</plist>
