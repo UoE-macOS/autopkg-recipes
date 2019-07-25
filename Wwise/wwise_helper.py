@@ -101,9 +101,21 @@ def main(args):
     }
 
     ARCHIVES_APP = ['Wwise.app.zip']
+
     ARCHIVES_AUTHORING = ['Authoring.tar.xz',
                           'FilePackager.x64.tar.xz',
-                          'Authoring.x64.tar.xz', ]
+                          'Authoring.x64.tar.xz',
+                          'Authoring.Documentation.tar.xz']
+                          
+    ARCHIVES_SDK = ['SDK.tar.xz',
+                    'SDK.FilePackager.tar.xz',
+                    'SDK.Documentation.tar.xz',
+                    'SDK.Mac.tar.xz',
+                    'SDK.Documentation.Mac.tar.xz',
+                    'SDK.Windows_vc140.tar.xz',
+                    'SDK.Windows_vc150.tar.xz',
+                    'SDK.Windows_vc120.tar.xz',
+                    ]
 
     INSTALL_PATH = 'Applications/Audiokinetic/Wwise ' + \
         args.BUNDLE.replace('_', '.')
@@ -143,7 +155,7 @@ def main(args):
         
         sorted_versions = sorted(
             available_versions, key=lambda k: LooseVersion(k))
-        latest_version = available_versions[0]
+        latest_version = sorted_versions[-1]
         args.BUNDLE = latest_version
     
         print('Latest Version:', args.BUNDLE)
@@ -181,7 +193,7 @@ def main(args):
     if args.STYLE == 'mini':
         # Only install the app and required Authoring packages
         to_download = [f for f in bundle_data['files']
-                       if f['name'] in (ARCHIVES_APP + ARCHIVES_AUTHORING)]
+                       if f['name'] in (ARCHIVES_APP + ARCHIVES_AUTHORING + ARCHIVES_SDK)]
     else:
         to_download = bundle_data['files']
 
@@ -226,6 +238,12 @@ def main(args):
     print("Installing authoring support to {}".format(support_files))
     for arc in [f for f in bundle_data['files'] if f['name'] in ARCHIVES_AUTHORING]:
         unarchive(arc, DOWNLOAD_DIR, support_files)
+        update_receipt(arc, receipt)
+
+    # INstall the SDK files
+    print("Installing SDK files to {}".format(INSTALL_DIR))
+    for arc in [f for f in bundle_data['files'] if f['name'] in ARCHIVES_SDK]:
+        unarchive(arc, DOWNLOAD_DIR, INSTALL_DIR)
         update_receipt(arc, receipt)
 
     # Write the install data
