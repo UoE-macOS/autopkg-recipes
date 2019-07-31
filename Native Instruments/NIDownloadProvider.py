@@ -80,10 +80,14 @@ class NIDownloadProvider(Processor):
         if report_data:
             self.env["ni_downloader_summary_result"] = {
                 'summary_text': ("The NIDownloader processor created the following items:\n"),
-                'report_fields': ['package', 'version'],
+                'report_fields': ['package_path', 'version'],
+                 # The helper tool is capable of creating multiple packages in a single 
+                 # invocation; however, autopkg can only report on one, and we only ever
+                 # ask it to create a single package.
                 'data': report_data[0]
             }
 
+            # Set our other output variables
             self.env['version'] = report_data[0]['version']
             self.env['package_path'] = report_data[0]['package_path']
 

@@ -173,7 +173,9 @@ def main(args):
     # Stash our auth token.
     AUTH_HEADER['Authorization'] = 'Bearer ' + token
 
+    # Maintain a list of the packages we create
     report_data = []
+
     for prod in products:
         for dist_type in dist_types:
             try:
@@ -203,7 +205,7 @@ def main(args):
                                                                   dist_type, '_packages'))
                             # If the variables are empty, nothing was created
                             if final_pkg and final_version:
-                                report_data.append({'package': final_pkg, 'version': final_version})
+                                report_data.append({'package_path': final_pkg, 'version': final_version})
 
                             continue
                         path = None # Set this to something so we can reference it in the finally block
@@ -215,7 +217,7 @@ def main(args):
                                                                       dist_type, '_packages'))
                                 # If the variables are empty, nothing was created
                                 if final_pkg and final_version:
-                                    report_data.append({'package': final_pkg, 'version': final_version})
+                                    report_data.append({'package_path': final_pkg, 'version': final_version})
                             else:
                                 install_pkg(path + '/' + pkg, candidate, version)
 
@@ -231,6 +233,7 @@ def main(args):
                 sys.stderr.write("{}\n".format(err))
                 continue
     if report_data != []:
+        # If we created something, report on it
         return report_data    
 
 
