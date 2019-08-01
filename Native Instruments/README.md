@@ -25,7 +25,7 @@ python ~/Library/AutoPkg/RecipeRepos/com.github.uoe-macos.autopkg-recipes/Native
                 --template-override-dest-dir ~/Library/AutoPkg/RecipeOverrides/NativeInstruments \
                 --suite=komplete --major-version=11
 ```
-NB: The `--suite` and `--major-version` arguments rely on there being a file named \<suite\>\_\<major_version\>.txt in the product_lists folder. So far I only have such a list for Komplete 11 - contributions welcome.
+NB: The `--suite` and `--major-version` arguments rely on there being a file named \<suite\>\_\<major_version\>.txt in the product_lists folder. So far we have such lists for Komplete 11 and Komplete 12. Further contributions are welcome.
 You can instead use the `--product-uuid` argument to template an override file for a single product.
 
 3. Now that you have a folder containing the override files you need, you can throw autopkg at it: 
@@ -41,9 +41,9 @@ Some configuration variables are available in the `NIDownloadProvider` processor
 * `version`: This does nothing. You get the latest version. 
 
 ### Product UUIDs
-I haven't been able to find any way to programatically determine the list of products that make up a suite (eg Komplete), so the processor needs to be given the UUID of the product you want to package. You can see the list of UUIDs for Komplete 11 in the `product_lists` directory. 
+I haven't been able to find any way to programatically determine the list of products that make up a suite (eg Komplete), so the processor needs to be given the UUID of the product you want to package. You can see the list of UUIDs for Komplete 11 and Komplete 12 in the `product_lists` directory. 
 
-How do you get the UUIDs for a given suite? Good question. The best place I can suggest is to look in the preference files in `/Library/Preferences.com.native-instruments*` on a machine with the suite that you want installed.
+How do you get the product UUIDs for a given suite? Good question. The best place I can suggest is to look in the preference files in `/Library/Application Support/Native Instruments/Service Center` on a machine with the suite installed. The XML files therein contain the UPIDs for most of the installed products; however, not every product leaves behind an XML file and we have had to resort to more devious means to determine the others. We are fairly confident the list for Komplete 12 is, um, complete.
 
 ## Implementation
 The `NIDownloadProvider.py` processor is a thin wrapper around the `native_instruments_helper.py` tool in this directory. `native_instruments_helper.py` can be used on its own to perform downloads or even full installs of Native Instruments products and suites. Run it for more information: `python ./native_instruments_helper.py --help`
