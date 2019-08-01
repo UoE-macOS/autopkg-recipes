@@ -187,6 +187,7 @@ def main(args):
                     # If we're in 'file templating mode' just do our stuff
                     if args.AUTOPKG_OVERRIDE:
                         template_override_file(args.OVERRIDE_SOURCE, args.OVERRIDE_DEST, art)
+                        time.sleep(1)
                         continue
 
                     files = process_artifact(art, dist_type=dist_type, download_dest=args.DOWNLOAD_DIR,
@@ -284,6 +285,10 @@ def read_suite(suite, version):
     id_list = None
     with open(suite_file, 'r') as f:
         id_list = f.readlines()
+        # Remove comments and newlines and blank lines
+        id_list = [f.strip() for f in id_list if ( not f.startswith('#') and not f == '\n')]
+        # Remove anything before a final comma
+        id_list = [f.split(',')[-1] if ',' in f else f for f in id_list]
     return id_list
 
 
@@ -532,7 +537,7 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
 
     return deco_retry
 
-@retry(SocketError, tries=4, delay=2, backoff=2)
+@retry((SocketError, urllib2.HTTPError), tries=4, delay=2, backoff=2)
 def fetch(url, dest=None, data=None, headers=None):
     """ Fetch `url`.
         If `data` is present send a POST request, otherwise GET
