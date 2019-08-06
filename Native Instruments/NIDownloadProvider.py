@@ -35,14 +35,21 @@ class NIDownloadProvider(Processor):
         "downloads": {
             "required": True,
             "description": "Where to download packages to"
+        },
+        "output": {
+            "required": True,
+            "description": "'package' or 'download'"
         }
     }
     output_variables = {
         "version": {
-            "description": "The version that was packaged"
+            "description": "The version of the product that was produced"
         },
         "package_path": {
-            "description": "The path to the package"
+            "description": "The path to the package (if any) that was produced"
+        },
+        "download_path": {
+            "description": "The path to the item (if any) that was downloaded"
         },
         "ni_downloader_summary_result": {
             "description": "Description of interesting results."
@@ -51,8 +58,7 @@ class NIDownloadProvider(Processor):
     description = __doc__
 
     def main(self):
-        """ Install the requested version of Wwise to the requested
-            directory
+        """ Do stuff.
         """
         # Hack alert - add RECIPE_SEARCH_DIRS to sys.path
         # so that we can load our wwise_helper. I suspect this
@@ -68,10 +74,22 @@ class NIDownloadProvider(Processor):
 
         import native_instruments_helper
 
+
+        print(self.env['output'])
         # Build an argument list as if we were going to call our
         # helper tool on the commandline
-        argv =  ['--packages', '--download-dir', self.env['downloads'],
+        argv =  ['--download-dir', self.env['downloads'],
                  '--product-uuid', self.env['product_uuid'] ]
+
+        output = self.env['output']
+        if output == "package":
+            argv.append('--packages')
+            report_field = 'package_path'
+        elif output == "download":
+            argv.append('--download-only')
+            report_field = 'download_path'
+        else:
+            raise EnvironmentError("Unknown output mode: %s".format(output))
 
         # Call our helper tool, passing it the argument list
         # we constructed above.
@@ -80,16 +98,17 @@ class NIDownloadProvider(Processor):
         if report_data:
             self.env["ni_downloader_summary_result"] = {
                 'summary_text': ("The NIDownloader processor created the following items:\n"),
-                'report_fields': ['package_path', 'version'],
+                'report_fields': [report_field, 'version'],
                  # The helper tool is capable of creating multiple packages in a single 
                  # invocation; however, autopkg can only report on one, and we only ever
                  # ask it to create a single package.
+                 # This needs to be a dict.
                 'data': report_data[0]
             }
 
             # Set our other output variables
             self.env['version'] = report_data[0]['version']
-            self.env['package_path'] = report_data[0]['package_path']
+            self.env[report_field] = report_data[0][report_field]
 
 if __name__ == "__main__":
     processor = NIDownloadProvider()

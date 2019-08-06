@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- This recipe is intended to be overridden. Use `autopkg make-override
+      to create an override for each product you want 
+-->
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Package A Native Instruments Product</string>
+    <key>Identifier</key>
+    <string>com.github.uoe-macos.download.native-instruments.product</string>
+    <key>Input</key>
+    <dict>
+        <key>NAME</key>
+        <string>Native Instruments Product</string>
+        <!-- Only the latest version is currenty supported.
+             This does nothing 
+        -->
+        <key>VERSION</key>
+        <string>LATEST</string>
+        <key>PRODUCT_UUID</key>
+        <string></string>
+        <key>DOWNLOADS</key>
+        <string></string>
+        <key>OUTPUT</key>
+        <string>download</string>
+    </dict>
+    <key>MinimumVersion</key>
+    <string>0.2.0</string>
+    <key>Process</key>
+    <array>        
+        <dict>
+            <key>Processor</key>
+            <string>NIDownloadProvider</string>
+            <key>Arguments</key>
+            <dict>
+                <key>version</key>
+                <string>%VERSION%</string>
+                <key>downloads</key>
+                <string>%DOWNLOADS%</string>
+                <key>product_uuid</key>
+                <string>%PRODUCT_UUID%</string>
+                <key>output</key>
+                <string>%OUTPUT%</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>EndOfCheckPhase</string>
+        </dict>
+    </array>
+</dict>
+</plist>

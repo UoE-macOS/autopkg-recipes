@@ -198,6 +198,7 @@ def main(args):
                     for (candidate, version) in files:
                         if args.DOWNLOAD_ONLY or is_installed(candidate, version):
                             # Already installed, or user has requested no installation
+                            report_data.append({'download_path': candidate, 'version': version})
                             continue
                         if args.PACKAGES and candidate.endswith('.iso'):
                             # Wrap the ISO in a .pkg installer
