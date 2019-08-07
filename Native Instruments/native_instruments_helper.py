@@ -240,14 +240,29 @@ def main(args):
 
 
 def template_override_file(source, dest_dir, artifact):
+
     source_type = os.path.basename(source).split('.')[-2]
-    out_file = "{}.{}.recipe".format(os.path.join(dest_dir, artifact['title'].replace(' ', '')),
-                                    source_type)
+
+    ## Native Instruments 'title' property includes a version number
+    ## which we don't want in or filename or the recipe name. It seems to 
+    ## be the first three elements of the number found in the 'version'
+    ## property.
+
+    ## Look up the version number, and remove it from the title if it's present
+    ## to create a 'canonical' version of the title.
+    short_version = '.'.join(artifact['version'].split('.')[0:3])
+    canonical_title_with_spaces = artifact['title'].replace(short_version, '').strip()
+    canonical_title_without_spaces = canonical_title_with_spaces.replace(' ', '')
+
+    out_file = "{}.{}.recipe".format(os.path.join(dest_dir, 
+                                                  canonical_title_without_spaces),
+                                     source_type)
     
     in_plist = plistlib.readPlist(source)
     
-    in_plist['Identifier'] = "local.{}.{}".format(source_type, artifact['title'].replace(' ', ''))
-    in_plist['Input']['NAME'] = artifact['title']
+    in_plist['Identifier'] = "local.{}.{}".format(source_type, 
+                                                  canonical_title_without_spaces)
+    in_plist['Input']['NAME'] = canonical_title_with_spaces
     in_plist['Input']['PRODUCT_UUID'] = artifact['upid']
 
     plistlib.writePlist(in_plist, out_file)
