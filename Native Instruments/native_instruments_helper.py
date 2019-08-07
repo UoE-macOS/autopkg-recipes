@@ -239,14 +239,16 @@ def main(args):
         return report_data    
 
 
-def template_override_file(source, dest_dir, art):
-    out_file = os.path.join(dest_dir, art['title'].replace(' ', '') + '.pkg.recipe')
+def template_override_file(source, dest_dir, artifact):
+    source_type = os.path.basename(source).split('.')[-2]
+    out_file = "{}.{}.recipe".format(os.path.join(dest_dir, artifact['title'].replace(' ', '')),
+                                    source_type)
     
     in_plist = plistlib.readPlist(source)
     
-    in_plist['Identifier'] = "local.package.{}".format(art['title'].replace(' ', ''))
-    in_plist['Input']['NAME'] = art['title']
-    in_plist['Input']['PRODUCT_UUID'] = art['upid']
+    in_plist['Identifier'] = "local.{}.{}".format(source_type, artifact['title'].replace(' ', ''))
+    in_plist['Input']['NAME'] = artifact['title']
+    in_plist['Input']['PRODUCT_UUID'] = artifact['upid']
 
     plistlib.writePlist(in_plist, out_file)
     print("Wrote:", out_file)
