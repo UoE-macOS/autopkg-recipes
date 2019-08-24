@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Download and build Projucer
+-->
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Download and build projucer</string>
+    <key>Identifier</key>
+    <string>com.github.uoe-macos.download.juce</string>
+    <key>Input</key>
+    <dict>
+        <key>NAME</key>
+        <string>JUCE</string>
+    </dict>
+    <key>MinimumVersion</key>
+    <string>0.5.0</string>
+    <key>Process</key>
+    <array>
+        <dict>
+            <key>Processor</key>
+            <string>URLTextSearcher</string>
+            <key>Arguments</key>
+            <dict>
+                <key>url</key>
+                <string>https://shop.juce.com/get-juce/download</string>
+                <key>re_pattern</key>
+                <string>cloudfront.net/juce/juce-(\d\.\d\.\d)-osx.zip</string>
+                <key>result_output_var_name</key>
+                <string>version</string>
+            </dict>
+        </dict>   
+        <!-- This doesn't work, I think because the 'Releases' in 
+            the WeAreROLI/JUCE repo aren't real releases, they're just tags.
+            <dict>
+            <key>Processor</key>
+            <string>GitHubReleasesInfoProvider</string>
+            <key>Arguments</key>
+            <dict>
+                <key>asset_regex</key>
+                <string>\d\.\d\.\d\.zip$</string>
+                <key>github_repo</key>
+                <string>WeAreROLI/JUCE</string>
+                <key>include_prereleases</key>
+                <string>False</string>
+            </dict>
+        </dict>     -->  
+        <dict>
+            <key>Processor</key>
+            <string>URLDownloader</string>
+            <key>Arguments</key>
+            <dict>
+            	<key>filename</key>
+            	<string>%NAME%.zip</string>
+                <key>url</key>
+                <string>https://d30pueezughrda.cloudfront.net/juce/juce-%version%-osx.zip</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>EndOfCheckPhase</string>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>Unarchiver</string>
+            <key>Arguments</key>
+            <dict>
+                <key>archive_path</key>
+                <string>%RECIPE_CACHE_DIR%/downloads/%NAME%.zip</string>
+                <key>destination_path</key>
+                <string>%RECIPE_CACHE_DIR%/source</string>
+                <key>purge_destination</key>
+                <false/>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>com.github.uoe-macos.autopkg-recipes.SharedProcessors/FindAndReplaceInFile</string>
+            <key>Arguments</key>
+            <dict>
+                <key>find</key>
+                <string>JUCER_ENABLE_GPL_MODE 0</string>
+                <key>file</key>
+                <string>%RECIPE_CACHE_DIR%/source/JUCE/extras/Projucer/JuceLibraryCode/AppConfig.h</string>
+                <key>replace</key>
+                <string>JUCER_ENABLE_GPL_MODE 1</string>
+                <key>count</key>
+                <integer>1</integer>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>com.github.uoe-macos.autopkg-recipes.SharedProcessors/XCodeBuilder</string>
+            <key>Arguments</key>
+            <dict>
+                <key>project_file</key>
+                <string>%RECIPE_CACHE_DIR%/source/JUCE/extras/Projucer/Builds/MacOSX/Projucer.xcodeproj</string>
+                <key>build_config</key>
+                <string>Release</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>
