@@ -198,6 +198,7 @@ def main(args):
                     for (candidate, version) in files:
                         if args.DOWNLOAD_ONLY or is_installed(candidate, version):
                             # Already installed, or user has requested no installation
+                            report_data.append({'download_path': candidate, 'version': version})
                             continue
                         if args.PACKAGES and candidate.endswith('.iso'):
                             # Wrap the ISO in a .pkg installer
@@ -238,14 +239,31 @@ def main(args):
         return report_data    
 
 
-def template_override_file(source, dest_dir, art):
-    out_file = os.path.join(dest_dir, art['title'].replace(' ', '') + '.pkg.recipe')
+def template_override_file(source, dest_dir, artifact):
+
+    source_type = os.path.basename(source).split('.')[-2]
+
+    ## Native Instruments 'title' property includes a version number
+    ## which we don't want in our filename or the recipe name. It seems to 
+    ## be the first three elements of the number found in the 'version'
+    ## property.
+
+    ## Look up the version number, and remove it from the title if it's present
+    ## to create a 'canonical' version of the title.
+    short_version = '.'.join(artifact['version'].split('.')[0:3])
+    canonical_title_with_spaces = artifact['title'].replace(short_version, '').strip()
+    canonical_title_without_spaces = canonical_title_with_spaces.replace(' ', '')
+
+    out_file = "{}.{}.recipe".format(os.path.join(dest_dir, 
+                                                  canonical_title_without_spaces),
+                                     source_type)
     
     in_plist = plistlib.readPlist(source)
     
-    in_plist['Identifier'] = "local.package.{}".format(art['title'].replace(' ', ''))
-    in_plist['Input']['NAME'] = art['title']
-    in_plist['Input']['PRODUCT_UUID'] = art['upid']
+    in_plist['Identifier'] = "local.{}.{}".format(source_type, 
+                                                  canonical_title_without_spaces)
+    in_plist['Input']['NAME'] = canonical_title_with_spaces
+    in_plist['Input']['PRODUCT_UUID'] = artifact['upid']
 
     plistlib.writePlist(in_plist, out_file)
     print("Wrote:", out_file)
