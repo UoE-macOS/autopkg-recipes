@@ -244,7 +244,7 @@ def template_override_file(source, dest_dir, artifact):
     source_type = os.path.basename(source).split('.')[-2]
 
     ## Native Instruments 'title' property includes a version number
-    ## which we don't want in or filename or the recipe name. It seems to 
+    ## which we don't want in our filename or the recipe name. It seems to 
     ## be the first three elements of the number found in the 'version'
     ## property.
 
