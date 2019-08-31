@@ -55,6 +55,11 @@
 				<key>file_content</key>
 				<string>#!/bin/bash
 echo "################ INSTALLING PRO TOOLS #################"
+# Some post install scripts look for $HOME which won't be set
+# if we are running with nobody logged in. Set it here before
+# running the installer
+
+export HOME='/tmp'
 installer -target / -pkg ./%NAME%.pkg
 echo "################ INSTALLED PRO TOOLS ##################"
 echo "################ RUNNING POSTINSTALL FIXES ###############"
