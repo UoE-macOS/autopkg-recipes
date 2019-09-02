@@ -40,6 +40,7 @@ projucer_settings_file="`cat << EOF
     <license type="GPL" applicationUsageData="disabled" username="GPL mode"
              email="" authToken=""/>
   </VALUE>
+  <VALUE name="lastWizardFolder" val="/Users/${user_name}/Documents"/>
 </PROPERTIES>
 EOF`"
 
