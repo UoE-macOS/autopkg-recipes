@@ -10,16 +10,20 @@ This repo provides an AutoPkg processor which emulates enough of the behaviour o
 
 Suites (such as Komplete) are made up of numerous products, and this repo includes a command that you can use to easily generate your own set of override files, one for each product in a suite that you want to package.
 
-### `NativeInstrumentsProduct.download.recipe`
+`NativeInstrumentsProduct.download.recipe`
+
 The `.download` recipe just downloads the product disk images (some are available as `.dmg` files, some are `.iso`). Its main use is to chain other recipes onto.
 
-### `NativeInstrumentsProduct.munki.recipe`
+`NativeInstrumentsProduct.munki.recipe`
+
 The `.munki` recipe can be used to import the downloaded images directly into munki. Thanks to @andrewvalentine for contributing this.
 
-### `NativeInstrumentsProduct.pkg.recipe`
+`NativeInstrumentsProduct.pkg.recipe`
+
 The `.pkg` recipe can be used if you want to generate a package for each product that can be directly installed by less-intelligent package management tools, such as JAMFPro. 
 
-### `NativeInstrumentsSuiteNetInstall.pkg.recipe`
+`NativeInstrumentsSuiteNetInstall.pkg.recipe`
+
 This can be used to generate a single, payloadless, package which contains a postinstall script to install a whole suite, directly from Native Instruments' CDN, on a client machine.
 
 ## How to use this repo
@@ -71,5 +75,5 @@ The `NIDownloadProvider.py` processor is a thin wrapper around the `native_instr
 ## DISCLAIMER
 This recipe and associated helper tool use an undocumented and unsupported API. They may break at any time. Please refer to this repository's [LICENSE](https://github.com/UoE-macOS/autopkg-recipes/blob/master/LICENSE)
 
-## CREDITE
+## CREDITS
 Many thanks to those who have contributed to making this a useful repo. @neilmartin83, @achmelvic, @andrewvalentine at macadmins have all provided invaluable help, advice and camaraderie.
