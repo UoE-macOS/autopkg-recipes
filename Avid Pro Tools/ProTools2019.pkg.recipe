@@ -9,7 +9,7 @@
 	<key>Input</key>
 	<dict>
 		<key>VERSION</key>
-                <string>2019.6</string>
+        <string>2019.6</string>
 		<key>RELEASE</key>
 		<string>1</string>
 		<key>ID</key>
@@ -94,11 +94,27 @@ rm -f $PLIST # In case Pro Tools has been updated from a previous version
  
 /bin/launchctl load $PLIST
 
-# added in from Media Composer 8.5.x, make the Avid Application Manager as quiet as possible
-rm /Library/LaunchAgents/com.avid.ApplicationManager.plist
-defaults write /Library/Preferences/com.avid.Application\ Manager enterpriseMode -bool true
-defaults write /Library/Preferences/com.avid.Application\ Manager showAppNotifications -bool false
-defaults write /Library/Preferences/com.avid.Application\ Manager showFeedsNotifications -bool false
+# Silence Avid Link, courtesy of @neillmartin83
+​
+loggedInUser=$( scutil <<< "show State:/Users/ConsoleUser" | awk '/Name :/ && ! /loginwindow/ { print $3 }' )
+​
+if [[ "$loggedInUser" != "" ]]; then
+	/bin/echo "User $loggedInUser is logged in, quitting Avid Link"
+    /usr/bin/killall "Avid Link"
+    /usr/bin/sudo -u "$loggedInUser" /usr/bin/defaults delete "/Users/$loggedInUser/Library/Preferences/com.avid.Avid Link.plist"
+fi
+​
+/usr/libexec/PlistBuddy -c "Set RunAtLoad false" /Library/LaunchAgents/com.avid.avidlink.plist
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Auto-Update" -bool false
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Download-PT-plugins" -bool false
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Hide-On-Launch" -bool false
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Notification-Chat-Status" -bool false
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Notification-Invites" -bool false
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Notification-Messages" -bool false
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Notification-Updates" -bool false
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" "Application Manager.Product Updates.Hide-On-Launch" -bool true
+/usr/bin/defaults write "/Library/Preferences/com.avid.Avid Link.plist" enterpriseMode -bool true
+
 echo "###################### DONE #####################"
 exit 0 
 </string>
