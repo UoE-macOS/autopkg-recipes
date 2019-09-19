@@ -16,7 +16,7 @@ The `.download` recipe just downloads the product disk images (some are availabl
 
 `NativeInstrumentsProduct.munki.recipe`
 
-The `.munki` recipe can be used to import the downloaded images directly into munki. Thanks to @andrewvalentine for contributing this.
+The `.munki` recipe can be used to import the downloaded images directly into munki. Thanks to <a href="https://github.com/andrewvalentine" target="_blank">@andrewvalentine</a> for contributing to this.
 
 `NativeInstrumentsProduct.pkg.recipe`
 
