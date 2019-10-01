@@ -36,7 +36,7 @@ or
 
 autopkg make-override NativeInstrumentsProduct.munki.recipe
 ```
-You might wan to edit the file override created by this step, to specify a custom Download location or (if you have used the `.munki` recipe) to set some munki variables approproate to your environment. 
+You might want to edit the file override created by this step, to specify a custom Download location or (if you have used the `.munki` recipe) to set some munki variables appropriate to your environment. 
 
 2. Next, use the helper tool to use this file as a template to generate overrides for each of the products you want to package. This will simply copy the template override file you made in step 1 multiple times, replacing the relevant name and UUID for each product. the example below assumes you are using the `.pkg` recipe: be sure to replace `--template-override-source` with the correct file.
 ```
@@ -56,6 +56,11 @@ If you like, you can instead use the `--product-uuid` argument to template an ov
 autopkg run ~/Library/AutoPkg/RecipeOverrides/NativeInstruments/*
 ```
 and wait a while.
+
+Note that, if you are a Munki user, you only need to run the `.munki` recipes:
+```
+autopkg run ~/Library/AutoPkg/RecipeOverrides/NativeInstruments/*.munki.recipe
+```
 
 ## Processor Configuration
 Some configuration variables are available in the `NIDownloadProvider` processor:
