@@ -96,7 +96,7 @@ rm -f $PLIST # In case Pro Tools has been updated from a previous version
 
 # Silence Avid Link, courtesy of @neillmartin83
 ​
-loggedInUser=$( scutil <<< "show State:/Users/ConsoleUser" | awk '/Name :/ && ! /loginwindow/ { print $3 }' )
+loggedInUser=$( scutil &lt;&lt;&lt; "show State:/Users/ConsoleUser" | awk '/Name :/ &amp;&amp; ! /loginwindow/ { print $3 }' )
 ​
 if [[ "$loggedInUser" != "" ]]; then
 	/bin/echo "User $loggedInUser is logged in, quitting Avid Link"
