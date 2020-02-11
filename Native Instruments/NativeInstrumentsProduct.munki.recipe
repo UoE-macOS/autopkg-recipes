@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- This recipes is intended to be overridden. Use `autopkg make-overrde to create an override for each product you want -->
 <plist version="1.0">
 <dict>
 	<key>Description</key>
 	<string>Downloads and imports the latest versions of the Native Instruments software suite into Munki</string>
 	<key>Identifier</key>
-	<string>com.github.andrewvalentine.munki.native-instruments.product</string>
+	<string>com.github.uoe-macos.munki.native-instruments.product</string>
 	<key>Input</key>
 	<dict>
 		<key>CATEGORY</key>
@@ -24,6 +24,7 @@
 		<string>Native Instruments Product</string>
 		<key>PRODUCT_UUID</key>
 		<string></string>
+		<!-- Only the latest version is currently supported. This does nothing. -->
 		<key>VERSION</key>
 		<string>LATEST</string>
 		<key>pkginfo</key>
