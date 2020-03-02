@@ -13,7 +13,7 @@
 		<key>RELEASE</key>
 		<string>1</string>
 		<key>ID</key>
-		<key>com.github.uoe-macos.pkg.ProTools2019.pkg</key>
+		<string>com.github.uoe-macos.pkg.ProTools2019.pkg</string>
 		<key>NAME</key>
 		<string>ProTools2019</string>
 	</dict>
