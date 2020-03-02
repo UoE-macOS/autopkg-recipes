@@ -6,7 +6,7 @@
 	<key>Description</key>
 	<string>Downloads and imports the latest versions of the Native Instruments software suite into Munki</string>
 	<key>Identifier</key>
-	<string>com.github.andrewvalentine.munki.native-instruments.product</string>
+	<string>com.github.uoe-macos.munki.native-instruments.product</string>
 	<key>Input</key>
 	<dict>
 		<key>CATEGORY</key>
