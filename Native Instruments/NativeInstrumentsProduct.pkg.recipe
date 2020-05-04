@@ -22,6 +22,8 @@
         <string></string>
         <key>DOWNLOADS</key>
         <string></string>
+        <key>OUTPUT</key>
+        <string>package</string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.2.0</string>
@@ -38,6 +40,8 @@
                 <string>%DOWNLOADS%</string>
                 <key>product_uuid</key>
                 <string>%PRODUCT_UUID%</string>
+                <key>output</key>
+                <string>%OUTPUT%</string>
             </dict>
         </dict>
         <dict>
