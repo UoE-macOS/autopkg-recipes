@@ -39,6 +39,14 @@ class NIDownloadProvider(Processor):
         "output": {
             "required": True,
             "description": "'package' or 'download'"
+        },
+        "username": {
+            "required": True,
+            "description": "Username for Native Instruments account"
+        },
+        "password": {
+            "required": True,
+            "description": "Password for Native Instruments account"
         }
     }
     output_variables = {
@@ -79,7 +87,9 @@ class NIDownloadProvider(Processor):
         # Build an argument list as if we were going to call our
         # helper tool on the commandline
         argv =  ['--download-dir', self.env['downloads'],
-                 '--product-uuid', self.env['product_uuid'] ]
+                 '--product-uuid', self.env['product_uuid'],
+                 '--username', self.env['username'],
+                 '--password', self.env['password'] ]
 
         output = self.env['output']
         if output == "package":
