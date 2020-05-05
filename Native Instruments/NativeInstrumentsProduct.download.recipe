@@ -24,6 +24,10 @@
         <string></string>
         <key>OUTPUT</key>
         <string>download</string>
+        <key>USERNAME</key>
+        <string></string>
+        <key>PASSWORD</key>
+        <string></string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.2.0</string>
@@ -42,6 +46,10 @@
                 <string>%PRODUCT_UUID%</string>
                 <key>output</key>
                 <string>%OUTPUT%</string>
+                <key>username</key>
+                <string>%USERNAME%</string>
+                <key>password</key>
+                <string>%PASSWORD%</string>
             </dict>
         </dict>
         <dict>
