@@ -29,59 +29,71 @@ from socket import error as SocketError
 from distutils.version import LooseVersion
 import xml.etree.ElementTree as ET
 
+from pprint import pprint
 
 VERSION = '0.0.1'
 DESCRIPTION = 'TBD'
 
+import ssl
+_create_unverified_https_context = ssl._create_unverified_context
+ssl._create_default_https_context = _create_unverified_https_context
+
 def process_args(argv=None):
     """Process any commandline arguments"""
-    parser = argparse.ArgumentParser(description=DESCRIPTION,
-                                     version=VERSION)
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+
+    parser.add_argument('--username', dest='USERNAME',
+                        help=('Username for Native Instruments account used to download '
+                              'assets.'))
+
+    parser.add_argument('--password', dest='PASSWORD',
+                        help=('Password for Native Instruments account used to download '
+                              'assets.'))
 
     parser.add_argument('--download-dir',
-                        dest='DOWNLOAD_DIR', default='./_downloads', 
+                        dest='DOWNLOAD_DIR', default='./_downloads',
                         help=('Directory in which to download the installers.'
                               'Installers will be deleted when finished, unless '
                               '--preserve-downloads is specified '
                               'Default: ./_downloads'))
 
     parser.add_argument('--suite',
-                        dest='SUITE', default=None, 
+                        dest='SUITE', default=None,
                         help=('Suite to package. There must be a corresponding file in the '
                               'product_lists directory in the same directory as this script'))
 
     parser.add_argument('--major-version',
-                        dest='MAJOR_VERSION', default=None, 
-                        help=('Major version of SUITE to package. There must be a corresponding ' 
+                        dest='MAJOR_VERSION', default=None,
+                        help=('Major version of SUITE to package. There must be a corresponding '
                               'file in the product_lists directory in the same directory as this script'))
 
     parser.add_argument('--preserve-downloads', default=False, action='store_true',
                         dest='PRESERVE', help=('Do not delete downloads after installation. '
-                                               'WARNING: requires at least 130GB of free space ' 
+                                               'WARNING: requires at least 130GB of free space '
                                                'in the download directory, PLUS the same again on '
                                                'the installation target.'))
 
     parser.add_argument('--download-only', default=False, action='store_true',
-                        dest='DOWNLOAD_ONLY', 
+                        dest='DOWNLOAD_ONLY',
                         help=('Do not install, only download (implies --preserve-downloads)'))
 
     parser.add_argument('--updates-only', default=False, action='store_true',
-                        dest='UPDATES_ONLY', 
+                        dest='UPDATES_ONLY',
                         help=('Do not look for new full product installers, only updates. This '
                               'can hopefully be used to update an existing installation. YMMV'))
-    
+
     parser.add_argument('--updates', default=False, action='store_true',
-                        dest='UPDATES', 
+                        dest='UPDATES',
                         help=('Look for updates as well as full products. Generally, full products '
                               'are already the latest version, so you probably want --updates-only '
                               'instead of this option if you are looking for updates.'))
 
     parser.add_argument('--packages', default=False, action='store_true',
-                        dest='PACKAGES', 
+                        dest='PACKAGES',
                         help=('Copy packages into a subfolder in the downloads folder.'
                               'implies --download-only'))
 
-    parser.add_argument('--product-uuid', dest='UUID', 
+    parser.add_argument('--product-uuid', dest='UUID',
                         help=('Give the UUID of a single product to operate on it '
                               'individually'))
 
@@ -114,11 +126,11 @@ PROTOBUF_HEADERS = {'Accept': 'application/x-protobuf',
                     'Content-Type': 'application/x-protobuf'}
 
 JSON_HEADERS = {'Accept': 'application/json',
-                'Content-Type': 'application/x-protobuf'}
+                'Content-Type': 'application/json'}
 
 METALINK_HEADERS = {'Accept': 'application/metalink4+xml'}
 
-USER_AGENT = {'User-Agent': 'NativeAccess/1.7.2 (R88)'}
+USER_AGENT = {'User-Agent': 'NativeAccess/1.12.0 (R129)'}
 
 AUTH_HEADER = {'Authorization': ''}
 
@@ -133,7 +145,7 @@ def main(args):
         products = [args.UUID]
     elif args.SUITE and args.MAJOR_VERSION:
         products = read_suite(args.SUITE, args.MAJOR_VERSION)
-    else: 
+    else:
         print("You need to specify --product-uuid or --suite and --major-version")
         sys.exit(255)
 
@@ -155,7 +167,7 @@ def main(args):
         # We need to grab the token from Native Access
         if args.DOWNLOAD_ONLY or args.PACKAGES:
             na_location = os.path.join(args.DOWNLOAD_DIR, 'Native Access')
-        else:   
+        else:
             na_location = ('/Applications')
 
         install_native_access(args.DOWNLOAD_DIR, na_location)
@@ -173,6 +185,12 @@ def main(args):
     # Stash our auth token.
     AUTH_HEADER['Authorization'] = 'Bearer ' + token
 
+    # Now we have our initial token, refresh it
+    token = refresh_token(args.USERNAME, args.PASSWORD)
+
+    # Update auth token
+    AUTH_HEADER['Authorization'] = 'Bearer ' + token
+
     # Maintain a list of the packages we create
     report_data = []
 
@@ -182,8 +200,9 @@ def main(args):
                 artifacts = get_artifacts(prod, dist_type)
 
                 latest = get_latest_artifacts(artifacts)
-                
+
                 for art in latest:
+                    # pprint(art)
                     # If we're in 'file templating mode' just do our stuff
                     if args.AUTOPKG_OVERRIDE:
                         template_override_file(args.OVERRIDE_SOURCE, args.OVERRIDE_DEST, art)
@@ -192,7 +211,7 @@ def main(args):
 
                     files = process_artifact(art, dist_type=dist_type, download_dest=args.DOWNLOAD_DIR,
                                              force_download=(args.DOWNLOAD_ONLY or args.PACKAGES))
-                    if not files: 
+                    if not files:
                         # This artifact has nothing for us to install
                         continue
                     for (candidate, version) in files:
@@ -202,8 +221,8 @@ def main(args):
                             continue
                         if args.PACKAGES and candidate.endswith('.iso'):
                             # Wrap the ISO in a .pkg installer
-                            (final_pkg, final_version) = wrap_iso(candidate, version, 
-                                                                  dest=os.path.join(args.DOWNLOAD_DIR, 
+                            (final_pkg, final_version) = wrap_iso(candidate, version,
+                                                                  dest=os.path.join(args.DOWNLOAD_DIR,
                                                                   dist_type, '_packages'))
                             # If the variables are empty, nothing was created
                             if final_pkg and final_version:
@@ -215,7 +234,7 @@ def main(args):
                             path, pkg = attach_image(candidate)
                             if args.PACKAGES:
                                 (final_pkg, final_version) = copy_pkg(os.path.join(path, pkg), version,
-                                                                      os.path.join(args.DOWNLOAD_DIR, 
+                                                                      os.path.join(args.DOWNLOAD_DIR,
                                                                       dist_type, '_packages'))
                                 # If the variables are empty, nothing was created
                                 if final_pkg and final_version:
@@ -236,7 +255,7 @@ def main(args):
                 continue
     if report_data != []:
         # If we created something, report on it
-        return report_data    
+        return report_data
 
 
 def template_override_file(source, dest_dir, artifact):
@@ -244,23 +263,27 @@ def template_override_file(source, dest_dir, artifact):
     source_type = os.path.basename(source).split('.')[-2]
 
     ## Native Instruments 'title' property includes a version number
-    ## which we don't want in our filename or the recipe name. It seems to 
+    ## which we don't want in our filename or the recipe name. It seems to
     ## be the first three elements of the number found in the 'version'
     ## property.
 
     ## Look up the version number, and remove it from the title if it's present
     ## to create a 'canonical' version of the title.
+    # print(artifact['version'])
+    major_version = artifact['version'].split('.')[0]
     short_version = '.'.join(artifact['version'].split('.')[0:3])
     canonical_title_with_spaces = artifact['title'].replace(short_version, '').strip()
     canonical_title_without_spaces = canonical_title_with_spaces.replace(' ', '')
 
-    out_file = "{}.{}.recipe".format(os.path.join(dest_dir, 
-                                                  canonical_title_without_spaces),
-                                     source_type)
-    
+    out_file = "{}{}.{}.recipe".format(os.path.join(dest_dir,
+                                                    canonical_title_without_spaces,
+                                                    ),
+                                       major_version,
+                                       source_type)
+
     in_plist = plistlib.readPlist(source)
-    
-    in_plist['Identifier'] = "local.{}.{}".format(source_type, 
+
+    in_plist['Identifier'] = "local.{}.{}".format(source_type,
                                                   canonical_title_without_spaces)
     in_plist['Input']['NAME'] = canonical_title_with_spaces
     in_plist['Input']['PRODUCT_UUID'] = artifact['upid']
@@ -281,23 +304,37 @@ def get_bearer_token(path):
     return token[0]
 
 
+def refresh_token(username, password):
+    """ Authenticate to NI and obtain a token we can use to
+        access the API """
+    auth = {"username": username,
+            "password": password}
+
+    resp = fetch('https://api.native-instruments.com/v1/auth/token',
+          data=auth, headers=JSON_HEADERS)
+
+    resp_data = json.loads(resp.read())['response_body']
+    token = resp_data['access']['token']
+
+    return token
+
 def install_native_access(downloads, install_dest):
     print('Downloading Native Access...')
     fetch(NATIVE_ACCESS_URL, dest=downloads + '/native-access.dmg')
     path, pkgs = attach_image(downloads + '/native-access.dmg')
 
     dest = os.path.join(install_dest, 'Native Access.app')
-    
+
     if os.path.isdir(dest):
         shutil.rmtree(dest)
-    
+
     print('Installing Native Access...')
     shutil.copytree(os.path.join(path, 'Native Access.app'), dest)
     unmount(path)
 
 
 def read_suite(suite, version):
-    suite_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 
+    suite_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                 'product_lists', "{}_{}.txt".format(suite, version))
     print("Reading", suite_file)
     id_list = None
@@ -365,7 +402,7 @@ def copy_pkg(package, version, dest):
 
     return((os.path.join(dest, out_pkg), version))
 
-def wrap_iso(iso, version, dest):    
+def wrap_iso(iso, version, dest):
     # Set up some names of things
     image_name = os.path.basename(iso)
     pkg_name = image_name[:-4]
@@ -381,7 +418,7 @@ def wrap_iso(iso, version, dest):
     tmp_dir = tempfile.mkdtemp(suffix="NativeInstruments", dir=dest)
 
     pkg_scripts = os.path.join(tmp_dir, 'Scripts')
-    
+
     os.mkdir(pkg_scripts)
 
     if os.path.getsize(iso) > MAX_FILE_SIZE:
@@ -391,9 +428,9 @@ def wrap_iso(iso, version, dest):
         # First convert to UDZO format
         dmg_path = os.path.join(tmp_dir, pkg_name + '.dmg')
         subprocess.check_call(['hdiutil', 'convert', '-format', 'UDZO', '-o', dmg_path, iso])
-        
+
         # Then split it up
-        subprocess.check_call(['hdiutil', 'segment', '-segmentSize', SEGMENT_SIZE, '-o', 
+        subprocess.check_call(['hdiutil', 'segment', '-segmentSize', SEGMENT_SIZE, '-o',
                                os.path.join(pkg_scripts, pkg_name + '.split'), dmg_path])
 
         image_name = image_name.replace('.iso', '.split.dmg')
@@ -412,7 +449,7 @@ pkg="$(ls "${{vol}}" | grep '\.pkg$' | egrep -v 'Part \d+\.pkg' | head -1)"
 if [ ! -z "${{pkg}}" ]
 then
     echo "Installing ${{pkg}}..."
-    installer -pkg "${{vol}}/${{pkg}}" -target / -dumplog  
+    installer -pkg "${{vol}}/${{pkg}}" -target / -dumplog
     sleep 5
 else
     echo "Can't find a package at ${{vol}}"
@@ -423,10 +460,10 @@ diskutil unmount "${{vol}}"
     with open(os.path.join(pkg_scripts, 'preinstall'), 'w') as f:
         f.write(preinstall_script)
 
-    subprocess.check_call(['chmod', '0755', 
+    subprocess.check_call(['chmod', '0755',
                            os.path.join(pkg_scripts, 'preinstall')])
 
-    subprocess.check_call(['pkgbuild', '--nopayload', 
+    subprocess.check_call(['pkgbuild', '--nopayload',
                            '--scripts', pkg_scripts,
                            '--version', version,
                            '--id', 'com.nativeinstruments.' + pkg_name,
@@ -457,7 +494,7 @@ def process_artifact(artifact, dist_type, download_dest, force_download=False):
 
     files_to_process = artifact['files']
     files_to_return = []
-    
+
     # If there is an 'installer_type' and an 'iso_type', we just want the installer
     if [ f for f in artifact['files'] if f['type'] == 'installer_type' ] != []:
         print("Ignoring ISO installers as a DMG is available")
@@ -471,7 +508,7 @@ def process_artifact(artifact, dist_type, download_dest, force_download=False):
         url = get_download_url(afile)
         print('{}, {}M, {}'.format(
             afile['target_file'], afile['filesize']/1024/1024, url))
-        
+
         if force_download is True or (not is_installed(afile['target_file'], artifact['version'])):
             outfile = os.path.join(download_dest, dist_type, afile['target_file'])
             if os.path.isfile(outfile) and not afile['filesize'] > os.path.getsize(outfile):
@@ -484,7 +521,7 @@ def process_artifact(artifact, dist_type, download_dest, force_download=False):
 
     return files_to_return
 
-        
+
 def get_download_url(a_file):
     # The 'url' attribute of a_file leads to an XML metalink
     # document which contains various information about the download
@@ -492,6 +529,7 @@ def get_download_url(a_file):
     meta_url = BASEURL + '/v1/download/' + a_file['url']
     resp = fetch(meta_url, headers=METALINK_HEADERS)
     tree = ET.fromstring(resp.read())
+    # pprint(ET.tostring(tree))
     url = tree.findall('.//{urn:ietf:params:xml:ns:metalink}url')[0].text
     return url
 
@@ -540,7 +578,7 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
             while mtries > 1:
                 try:
                     return f(*args, **kwargs)
-                except ExceptionToCheck, e:
+                except ExceptionToCheck as e:
                     msg = "%s, Retrying in %d seconds..." % (str(e), mdelay)
                     if logger:
                         logger.warning(msg)
@@ -562,6 +600,7 @@ def fetch(url, dest=None, data=None, headers=None):
         If `dest` is present, store the result there, otherwise
         return a file-like object.
     """
+    print("FETCH: " + url)
     myheaders = {}
     myheaders.update(USER_AGENT)
     myheaders.update(AUTH_HEADER)
@@ -574,7 +613,7 @@ def fetch(url, dest=None, data=None, headers=None):
         # If data is serialisable, send it as json
         try:
             data = json.dumps(data)
-        except:
+        except Exception:
             # Just send whatever we were passed, raw
             pass
     req = urllib2.Request(url, headers=myheaders, data=data)
