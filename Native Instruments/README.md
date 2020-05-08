@@ -36,7 +36,9 @@ or
 
 autopkg make-override NativeInstrumentsProduct.munki.recipe
 ```
-You might want to edit the file override created by this step, to specify a custom Download location or (if you have used the `.munki` recipe) to set some munki variables appropriate to your environment. 
+__You now need to edit the override file__ created by this step, to add the username and password of your Native Instruments account. If you like, you can also specify a custom Download location or (if you have used the `.munki` recipe) set some munki variables appropriate to your environment. 
+
+__warning__: Your Native Instruments password will be stored in plaintext the override files. Please make sure you are doing your packaging on a secure machine. Keychain integration is a Work In Progress!
 
 2. Next, use the helper tool to use this file as a template to generate overrides for each of the products you want to package. This will simply copy the template override file you made in step 1 multiple times, replacing the relevant name and UUID for each product. the example below assumes you are using the `.pkg` recipe: be sure to replace `--template-override-source` with the correct file.
 ```
@@ -81,4 +83,4 @@ The `NIDownloadProvider.py` processor is a thin wrapper around the `native_instr
 This recipe and associated helper tool use an undocumented and unsupported API. They may break at any time. Please refer to this repository's [LICENSE](https://github.com/UoE-macOS/autopkg-recipes/blob/master/LICENSE)
 
 ## CREDITS
-Many thanks to those who have contributed to making this a useful repo. @neilmartin83, @achmelvic, @andrewvalentine at macadmins have all provided invaluable help, advice and camaraderie.
+Many thanks to those who have contributed to making this a useful repo. @neilmartin83, @achmelvic, @andrewvalentine @lrhodes at macadmins have all provided invaluable help, advice and camaraderie.
