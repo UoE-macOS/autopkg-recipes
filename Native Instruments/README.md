@@ -47,6 +47,7 @@ python ~/Library/AutoPkg/RecipeRepos/com.github.uoe-macos.autopkg-recipes/Native
                 --template-autopkg-override \
                 --template-override-source ~/Library/AutoPkg/RecipeOverrides/NativeInstrumentsProduct.pkg.recipe \
                 --template-override-dest-dir ~/Library/AutoPkg/RecipeOverrides/NativeInstruments \
+                --username <NI Username> --password <NI Password>
                 --suite=komplete --major-version=11
 ```
 NB: The `--suite` and `--major-version` arguments rely on there being a file named \<suite\>\_\<major_version\>.txt in the product_lists folder. So far we have such lists for Komplete Standard 11 and Komplete Standard 12. Further contributions are welcome - please open a pull request.
