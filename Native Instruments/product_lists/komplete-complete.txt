@@ -1,3 +1,23 @@
+# Product List obtained: 20th May 2022
+# Native Access version: 1.14.1
+
+# After installing NI Access, opening it and signing in, the following file is created
+# /Libarary/Application Support/Native Access/Service Center/NativeAccess.xml
+
+# This appears to contain a complete list of all Native Instrument products, even if
+# they are not part of your licence.
+
+# The .xml can be prased for UPIDs by using the binary, xmlstarlet, avaliable via Homebrew.
+
+# Lines starting with '#' are ignored. 
+
+# Everything before a final comma is also ignored.
+
+# The processor uses the UPIDs in this file to find out which products
+# you want to package, but looks up all other information from the 
+# Native Instruments API - the product *names* in this file are 
+# for reference only and will NOT affect the names of your packaged products. 
+
 40s Very Own - Drums,ff06c804-8b3c-4d02-8271-577bb34c2cab
 40s Very Own - Keys,705fac2c-6c20-4c44-a83c-a55a34271a11
 57 Drawbar Organ,24c621a6-0f35-47b8-8a9d-ae22ca276e19
